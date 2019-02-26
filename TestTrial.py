@@ -228,7 +228,7 @@ def create(self, csvfile):
 #if __name__ == "__main__":
 #    main()
 
-root = Tk()
-root.title("Attempt Test")
-app = AttemptTest(root)
-root.mainloop() 
+# root = Tk()
+# root.title("Attempt Test")
+# app = AttemptTest(root)
+# root.mainloop() 
