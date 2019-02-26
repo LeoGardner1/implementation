@@ -163,27 +163,27 @@ class AttemptTest(Frame):
         ansA = Checkbutton(self, text="A.", font=("Arial", 10, "bold"))
         ansA.grid(row=5, column=0, sticky=E)
 
-        questionALbl = Label(self, text="'Answer from DB goes here'", font=("Arial", 10, "bold", "italic"))
+        questionALbl = Label(self, text="'Question from DB goes here'", font=("Arial", 10, "bold", "italic"))
         questionALbl.grid(row=5, column=1, sticky=E)
 
 
         ansB = Checkbutton(self, text="B.", font=("Arial", 10, "bold"))
         ansB.grid(row=7, column=0, sticky=E)
 
-        questionBLbl = Label(self, text="'Answer from DB goes here'", font=("Arial", 10, "bold", "italic"))
+        questionBLbl = Label(self, text="'Question from DB goes here'", font=("Arial", 10, "bold", "italic"))
         questionBLbl.grid(row=7, column=1, sticky=E)
         
 
         ansC = Checkbutton(self, text="C.", font=("Arial", 10, "bold"))
         ansC.grid(row=9, column=0, sticky=E)
 
-        questionCLbl = Label(self, text="'Answer from DB goes here'", font=("Arial", 10, "bold", "italic"))
+        questionCLbl = Label(self, text="'Question from DB goes here'", font=("Arial", 10, "bold", "italic"))
         questionCLbl.grid(row=9, column=1, sticky=E)
 
         ansD = Checkbutton(self, text="D.", font=("Arial", 10, "bold"))
         ansD.grid(row=11, column=0, sticky=E)
 
-        questionDLbl = Label(self, text="'Answer from DB goes here'", font=("Arial", 10, "bold", "italic"))
+        questionDLbl = Label(self, text="'Question from DB goes here'", font=("Arial", 10, "bold", "italic"))
         questionDLbl.grid(row=11, column=1, sticky=E)
 
 
