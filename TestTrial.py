@@ -123,17 +123,112 @@ class QuestionInfo(Frame):
         pass
 
     
+
+class AttemptTest(Frame):
+
+    def __init__(self, master):
+
+        Frame.__init__(self, master)
+        self.grid()
+
+        self.master = master
+
+        master.title("Attempt Test")
+        self.questionForm()
+        self.testName
+    
+    def questionForm(self):
+
+        #increment when adding another set
+        questionNo=1
+
+        questionLbl = Label(self, text="Question " + str(questionNo) + ":", font=("Arial", 10, "bold"))
+        questionLbl.grid(row=3, column=0, sticky=E)
+
+        questionTitleLbl = Label(self, text="'Question from DB goes here'", font=("Arial", 10, "bold", "italic"))
+        questionTitleLbl.grid(row=3, column=1, sticky=E)
+
+
+        # questionField = Entry(self)
+        # questionField.grid(row=3, column=1, ipadx="100")
+
+        answersLbl = Label(self, text="Answer Choices: (Tick the correct answer)", font=("Tahome", 10, "bold"))
+        answersLbl.grid(row=4, column=0, columnspan=6, sticky=W)
+
+
+        self.correctAns = StringVar()
+        
+        
+        #ansA = Checkbutton(self, text="A.", variable=self.correctAns, onvalue=1, offvalue=1)
+        ansA = Checkbutton(self, text="A.", font=("Arial", 10, "bold"))
+        ansA.grid(row=5, column=0, sticky=E)
+
+        questionALbl = Label(self, text="'Answer from DB goes here'", font=("Arial", 10, "bold", "italic"))
+        questionALbl.grid(row=5, column=1, sticky=E)
+
+
+        ansB = Checkbutton(self, text="B.", font=("Arial", 10, "bold"))
+        ansB.grid(row=7, column=0, sticky=E)
+
+        questionBLbl = Label(self, text="'Answer from DB goes here'", font=("Arial", 10, "bold", "italic"))
+        questionBLbl.grid(row=7, column=1, sticky=E)
+        
+
+        ansC = Checkbutton(self, text="C.", font=("Arial", 10, "bold"))
+        ansC.grid(row=9, column=0, sticky=E)
+
+        questionCLbl = Label(self, text="'Answer from DB goes here'", font=("Arial", 10, "bold", "italic"))
+        questionCLbl.grid(row=9, column=1, sticky=E)
+
+        ansD = Checkbutton(self, text="D.", font=("Arial", 10, "bold"))
+        ansD.grid(row=11, column=0, sticky=E)
+
+        questionDLbl = Label(self, text="'Answer from DB goes here'", font=("Arial", 10, "bold", "italic"))
+        questionDLbl.grid(row=11, column=1, sticky=E)
+
+
+        addQuestionBtn = Button(self, text="Submit Answer")
+        addQuestionBtn.grid(row=13, column=2)
+
+
+
+    def addForm():
+        pass
+
+    def testName(self):
+
+        testNamelbl = Label(self, text="\nEnter Test Name:\n", font=("Arial", 12, "bold"))
+        testNamelbl.grid(row=0, column=0, rowspan=3, sticky=NE)
+        
+        testNameField=Entry(self)
+        testNameField.grid(row=1, column=1, sticky=W, ipadx="100", columnspan=4)
+
+        testNameBtn = Button(self, text="Save", command=self.save)
+        testNameBtn.grid(row=1, column=2) 
+
+
+
+
+
+
+
+
     
 
 def create(self, csvfile):
     pass
 
 
-def main():
+#def main():
+#
+#    root = Tk()
+#    createQuestion = QuestionInfo(root)
+#    root.mainloop()
+#
+#if __name__ == "__main__":
+#    main()
 
-    root = Tk()
-    createQuestion = QuestionInfo(root)
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
+root = Tk()
+root.title("Attempt Test")
+app = AttemptTest(root)
+root.mainloop() 
