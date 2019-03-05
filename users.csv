@@ -1,0 +1,8 @@
+userID,password,surName,firstName,userType
+100000,Abcdef,First,One,Lecturer
+100001,Abcdef1,Second,Two,Student
+100002,Abcdef2,Third,Three,Lecturer
+100003,Abcdef3,Fourth,Four,Student
+100004,Abcdef4,Fifth,Five,Lecturer
+100005,Abcdef5,Sixth,Six,Student
+100006,Abcdef6,Seventh,Seven,Lecturer
