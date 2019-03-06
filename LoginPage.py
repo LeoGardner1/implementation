@@ -42,17 +42,15 @@ class LoginPage(Frame):
         pw_label = Label(text="Password: ")
         pw_label.grid(row=2, column=1)
         
-        passwordEnt = Entry(textvariable = self.password)
+        passwordEnt = Entry(textvariable = self.password, show="\u2022")
+        passwordEnt.bind('<Return>', self.user_auth)
         passwordEnt.grid(row=2, column=2)
 
         self.login_button = Button(text="Login", command=self.user_auth)
         self.login_button.grid(row=3, column=2)
 
-        #a = LecturerMenu(master)
 
-
-
-    def user_auth(self):
+    def user_auth(self, event=None):
         import csv
 
         username = self.username.get()
