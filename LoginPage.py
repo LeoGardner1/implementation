@@ -1,7 +1,8 @@
 from tkinter import *
 
+from StudentMenu import StudentMenu
 from LecturerMenu import LecturerMenu
-from StudentMenu import StudentMenu, centre_app
+from globalFunctions import *
 
 class LoginPage(Frame):
 
@@ -41,13 +42,15 @@ class LoginPage(Frame):
 
         pw_label = Label(text="Password: ")
         pw_label.grid(row=2, column=1)
-        
+
         passwordEnt = Entry(textvariable = self.password, show="\u2022")
         passwordEnt.bind('<Return>', self.user_auth)
         passwordEnt.grid(row=2, column=2)
+        
 
         self.login_button = Button(text="Login", command=self.user_auth)
         self.login_button.grid(row=3, column=2)
+
 
 
     def user_auth(self, event=None):
@@ -70,16 +73,15 @@ class LoginPage(Frame):
 
         if username in user_list:
             if user_list[username]["pw"] ==  password:
-                self.master.destroy()
+                #self.master.destroy()
+
                 if user_list[username]["user_type"] == "Lecturer":
-                    lecturer = Tk()
-                    lecturer.title("Lecturer Page")
-                    LecturerMenu(lecturer)
+
+                    newPage(self, LecturerMenu, "Lecturer Page")
                     
                 elif user_list[username]["user_type"] == "Student":
-                    student = Tk()
-                    student.title("Student Page")
-                    StudentMenu(student)
+
+                    newPage(self, StudentMenu, "Student Page")
 
                 else:
                     #change this into a prompt box
@@ -90,6 +92,9 @@ class LoginPage(Frame):
         else:
             #needs to be changed into a prompt box
             print("Incorrect Username / Password")
+
+
+
 
 root = Tk()
 app = LoginPage(root)

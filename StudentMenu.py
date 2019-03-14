@@ -1,5 +1,6 @@
 
 from tkinter import *
+from globalFunctions import *
 
 class StudentMenu(Frame):
 
@@ -34,7 +35,7 @@ root = Tk()
 app = LecturerMenu(root)
 root.mainloop()
         
-'''        
+     
 def centre_app(m, w, h):
 
     ws = m.winfo_screenwidth()
@@ -43,4 +44,4 @@ def centre_app(m, w, h):
     y = (hs/2) - (h/2)        
     return ("%dx%d+%d+%d" %(w, h , x, y))
 
-    
+'''    
