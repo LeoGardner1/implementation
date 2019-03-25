@@ -1,6 +1,7 @@
 
 from tkinter import *
 from globalFunctions import *
+import csv
 
 
 class LecturerMenu(Frame):
