@@ -1,6 +1,6 @@
 from tkinter import *
 from StudentMenu import StudentMenu
-from LecturerMenu import LecturerMenu
+from ViewSummative import ViewSummative
 from globalFunctions import *
 
 class SummativeMenu(Frame):
@@ -27,19 +27,14 @@ class SummativeMenu(Frame):
 
 	def createButtons(self):
 
-		def buttonClick(Form, title):
-			newPage(self, Form, title)
-
-		btnViewTest = Button(self, text = "View Summative Tests")
+		btnViewTest = Button(self, text = "View Summative Tests", command=lambda:newPage(self, ViewSummative, "Summative Test List"))
 		btnViewTest.grid(row=0, column=0)
 
 		btnViewResults = Button(self, text = "View Summative Results")
 		btnViewResults.grid(row=1, column=0)
 
-		btnBack = Button(self, text = "Back", command=buttonClick(StudentMenu, "Student Menu"))
+		btnBack = Button(self, text = "Back", command=lambda:newPage(self, StudentMenu, "Student Menu"))
 		btnBack.grid(row=2, column=0)
-
-
 # Main
 root = Tk()
 app = SummativeMenu(root)
