@@ -3,6 +3,7 @@ from tkinter import *
 from StudentMenu import StudentMenu
 from LecturerMenu import LecturerMenu
 from globalFunctions import *
+import tkinter.messagebox
 
 class LoginPage(Frame):
 
@@ -77,21 +78,18 @@ class LoginPage(Frame):
 
                 if user_list[username]["user_type"] == "Lecturer":
 
-                    newPage(self, LecturerMenu, "Lecturer Page")
+                    newPage(self, LecturerMenu, "Lecturer Page", username)
                     
                 elif user_list[username]["user_type"] == "Student":
 
-                    newPage(self, StudentMenu, "Student Page")
+                    newPage(self, StudentMenu, "Student Page", username)
 
                 else:
-                    #change this into a prompt box
-                    print("You don't have authorised access to this program")
+                    tkinter.messagebox.showwarning("Authorisation Error", "You don't have authorised access to this program")
             else:
-                #needs to be changed into a prompt box
-                print("Incorrect Password")
+                tkinter.messagebox.showwarning("Authorisation Error", "Incorrect Username / Password")
         else:
-            #needs to be changed into a prompt box
-            print("Incorrect Username / Password")
+            tkinter.messagebox.showwarning("Authorisation Error", "Incorrect Username / Password")
 
 
 
