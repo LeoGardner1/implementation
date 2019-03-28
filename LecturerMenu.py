@@ -48,13 +48,13 @@ class LecturerMenu(Frame):
         new_line1 = Label(self, text=" ")
         new_line1.grid(row=4, columnspan=2, sticky=NSEW)
 
-        butFormative = Button(self, text="Released Test", height=2, width=22, command="")
+        butFormative = Button(self, text="Released Formative Test", height=2, width=22, command=lambda:newPage(self, ReleasedFormativeTest, "Released Formative Test", self.lecturerID))
         butFormative.grid(row=5, column=1)
 
         new_line2 = Label(self, text=" ")
         new_line2.grid(row=6, columnspan=2, sticky=NSEW)
 
-        butFormative = Button(self, text="Completed Test", height=2, width=22, command="")
+        butFormative = Button(self, text="Released Summative Test", height=2, width=22, command="")
         butFormative.grid(row=7, column=1)
 
 class QuestionsSet(Frame):
@@ -510,6 +510,16 @@ class ReleaseFormative(Frame):
             return
 
         check_if_exist = os.path.isfile("ReleasedFormative.csv")
+
+        with open('ReleasedFormative.csv', 'r') as csvfile:
+
+            fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
+            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+            for row in reader:
+                if row["released_by"] == self.lecturerID and row["test_name"] == self.test_name and row["released_to"] == self.getStudent_cohorts.get():
+                    tkinter.messagebox.showwarning("Entry Error", "This test is already on released to " + self.getStudent_cohorts.get() + " students")
+                    return 
             
         with open('ReleasedFormative.csv', 'a+') as csvfile:
 
@@ -604,11 +614,21 @@ class ReleaseSummative(Frame):
             return
 
         check_if_exist = os.path.isfile("ReleasedSummative.csv")
+        
+        with open('ReleasedSummative.csv', 'r') as csvfile:
+
+            fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
+            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+            for row in reader:
+                if row["released_by"] == self.lecturerID and row["test_name"] == self.test_name and row["released_to"] == self.getStudent_cohorts.get():
+                    tkinter.messagebox.showwarning("Entry Error", "This test is already on released to " + self.getStudent_cohorts.get() + " students")
+                    return 
             
         with open('ReleasedSummative.csv', 'a+') as csvfile:
 
             fieldnames = ["test_name", "test_deadline", "test_duration", "date_released", "released_by", "released_to"]
-            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)                
 
             if not check_if_exist:
                 writer.writeheader()
@@ -619,12 +639,111 @@ class ReleaseSummative(Frame):
         tkinter.messagebox.showinfo("Test Release", self.test_name.upper() + " is now released as a summative assessment test to " + self.getStudent_cohorts.get() + " students")
 
         newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID)
+
+class ReleasedFormativeTest(Frame):
+
+    def __init__(self, master, *args):
+
+        Frame.__init__(self, master)
+        self.grid()
+
+        width = 500
+        height = 500
+        centred_window = centre_app(master, width, height)        
+        master.geometry(centred_window)
+
+        master.grid_columnconfigure(0, weight=1)
+        master.grid_columnconfigure(2, weight=1)
+        master.grid_columnconfigure(5, weight=1)
+        master.grid_columnconfigure(7, weight=1)
+
+        master.grid_rowconfigure(0, weight = 1)
+        master.grid_rowconfigure(2, weight = 2)
+        #master.grid_rowconfigure(6, weight = 1)
+        master.grid_rowconfigure(14, weight=5)
+
+        self.lecturerID = args[0]
+
+        self.display_released_formative()
+
+    def display_released_formative(self):
+
+        formative_list = []
+
+        with open("ReleasedFormative.csv", "r") as csvfile:
+            fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
+            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+            for row in reader:
+                if row["released_by"] == self.lecturerID:
+                    formative_list.append({"test_name": row["test_name"], "released_to": row["released_to"], "date_released": row["date_released"]})
+
+        row_adjuster = 0
+
+        self.getTestName = StringVar()
+        self.getTestName.set(' ')
+
+        if len(formative_list) == 0:
+            empty_testlbl = Label(text="You haven't released any formative test", font=("Arial", 14, "bold"))
+            empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
+            
+        else:
+            for i, item in enumerate(formative_list):
+
+                testName_button = Radiobutton(value='\"[' + item["released_to"] + ", " + item["test_name"] +  ", " + item["date_released"] + ']\"', text=str(i + 1) + ". " + item["test_name"], variable=self.getTestName)
+                testName_button.grid(row=row_adjuster + 4, column=1, sticky=W)
+
+                released_to_lbl = Label(text=item["released_to"])
+                released_to_lbl.grid(row=row_adjuster + 4, column=4, sticky=NSEW)
+
+                date_released_lbl = Label(text=item["date_released"])
+                date_released_lbl.grid(row=row_adjuster + 4, column=6, sticky=NSEW)
+                
+
+                row_adjuster += 1
         
+        goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
+        goBack_button.grid(row=1, column=1, sticky=NSEW)
+
+        view_stats_button = Button(text="View Test Statistics", width=20, command=self.view_stats)
+        view_stats_button.grid(row=1, column=6, sticky=NSEW)
+
+        Heading_lbl = Label(text="Formative Test On Released", font=("bold"))
+        Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
+
+        test_name_heading = Label(text="Name of Test", font=("MS", 10, "bold"))
+        test_name_heading.grid(row=3, column=1, columnspan=2, sticky=NSEW)
+
+        released_to_heading = Label(text="Released To", font=("MS", 10, "bold"))
+        released_to_heading.grid(row=3, column=4, sticky=NSEW)
+
+        date_released_heading = Label(text="Date Released", font=("MS", 10, "bold"))
+        date_released_heading.grid(row=3, column=6, sticky=NSEW)        
+
+    def view_stats(self):
+
+        test_name = self.getTestName.get()
+
+        if test_name != ' ':
+            test_name = ast.literal_eval(self.getTestName.get())
+
+        #testName = " ".join(test_name.split()[1:])
+        
+
+        print(test_name)
+
+        #print(testName)
+
+        if test_name == ' ':
+            tkinter.messagebox.showwarning("Entry Error", "Please select a test to view statistics")
+            return
+        #else:
+            #Change Class Name and Window Title and pass testName 
+            #newPage(self, ClassName, "Window Title", self.lecturerID, testName)
 
                            
 '''
 root = Tk()
 app = LecturerMenu(root)
 root.mainloop()
-
 '''
