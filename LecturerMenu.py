@@ -512,6 +512,14 @@ class ReleaseFormative(Frame):
 
         check_if_exist = os.path.isfile("ReleasedFormative.csv")
 
+        if not check_if_exist:
+            with open('ReleasedFormative.csv', 'w') as csvfile:
+
+                fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                writer.writeheader()
+
         with open('ReleasedFormative.csv', 'r') as csvfile:
 
             fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
@@ -615,7 +623,15 @@ class ReleaseSummative(Frame):
             return
 
         check_if_exist = os.path.isfile("ReleasedSummative.csv")
-        
+
+        if not check_if_exist:
+            with open('ReleasedSummative.csv', 'w') as csvfile:
+
+                fieldnames = ["test_name", "test_deadline", "test_duration", "date_released", "released_by", "released_to"]
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                writer.writeheader()
+
         with open('ReleasedSummative.csv', 'r') as csvfile:
 
             fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
