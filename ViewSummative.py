@@ -1,10 +1,47 @@
 from tkinter import *
 from globalFunctions import *
+import csv
 import os
 import glob
 
+
+class SummativeMenu(Frame):
+
+    def __init__(self, master, *args):
+
+        Frame.__init__(self, master)
+        self.grid()
+        master.title("Summative Test Menu")
+
+        width = 400
+        height = 300
+
+        centred_window = centre_app(master, width, height)
+
+        master.geometry(centred_window)
+
+        master.grid_columnconfigure(0, weight=1)
+        master.grid_rowconfigure(0, weight=1)
+        master.grid_columnconfigure(3, weight=1)
+        master.grid_rowconfigure(4, weight=1)
+
+        self.student_id = args[0]
+        self.createButtons()
+
+    def createButtons(self):
+
+        btnViewTest = Button(self, text = "View Summative Tests", command=lambda:newPage(self, ViewSummative, "Summative Test List"))
+        btnViewTest.grid(row=0, column=0)
+
+        btnViewResults = Button(self, text = "View Summative Results")
+        btnViewResults.grid(row=1, column=0)
+
+        btnBack = Button(self, text = "Back", command=lambda:newPage(self, StudentMenu, "Student Menu"))
+        btnBack.grid(row=2, column=0)
+
+
 class ViewSummative(Frame):
-    def __init__(self, master):
+    def __init__(self, master, *args):
 
         Frame.__init__(self, master)
         self.grid()
@@ -25,11 +62,10 @@ class ViewSummative(Frame):
         master.grid_rowconfigure(4, weight = 1)
 
         
-
+        #self.user_id = args[0]
+        self.user_id="110000"
         self.CreateList()
-        #self.CreateButtons()
     def CreateList(self):
-        import csv
         path = os.getcwd()
         #Code adapted from: https://stackoverflow.com/questions/9234560/find-all-csv-files-in-a-directory-using-python/12280052
         #Used to search for the available csv files in the dir.
@@ -42,7 +78,7 @@ class ViewSummative(Frame):
         Testlist.pack()
 
         for test in tests:
-            if test == 'users.csv':
+            if test == 'users.csv' or test == 'lecturers.csv':
                 tests.pop(tests.index(test))
             else:
                 Testlist.insert(END, test[:-4])
@@ -51,12 +87,15 @@ class ViewSummative(Frame):
         def ReadSelection():
             selection = Testlist.get(ACTIVE)
             selection += ".csv"
-            newPage(self, StartTest, "Take Test", selection)
+            newPage(self, StartTest, "Take Test", self.user_id, selection)
                 
         butTakeTest = Button(self, text="Take Test", command=lambda:ReadSelection())
         butTakeTest.grid()
 
-        butBack = Button(self, text="Back", command="")
+        if Testlist.size() == 0:
+            butTakeTest.config(state=DISABLED)
+
+        butBack = Button(self, text="Back", command=lambda:newPage(self, SummativeMenu, self.user_id, "Summative Menu"))
         butBack.grid()  
 
 
@@ -96,6 +135,7 @@ class StartTest(Frame):
 
         for i in range(0, numOfQuestions-1):
             print(self.testQuestions["question_no"][i])
+            #lblQuestion_no = 
 
     
     #def CheckAns(self):
