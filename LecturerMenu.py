@@ -31,6 +31,7 @@ class LecturerMenu(Frame):
         master.grid_rowconfigure(0, weight = 1)
 
         self.lecturerID = args[0]
+        #self.lecturerID = '100000'
 
         self.mainMenu()
 
@@ -54,7 +55,7 @@ class LecturerMenu(Frame):
         new_line2 = Label(self, text=" ")
         new_line2.grid(row=6, columnspan=2, sticky=NSEW)
 
-        butFormative = Button(self, text="Released Summative Test", height=2, width=22, command="")
+        butFormative = Button(self, text="Released Summative Test", height=2, width=22, command=lambda:newPage(self, ReleasedSummativeTest, "Released Summative Test", self.lecturerID))
         butFormative.grid(row=7, column=1)
 
 class QuestionsSet(Frame):
@@ -690,7 +691,8 @@ class ReleasedFormativeTest(Frame):
         else:
             for i, item in enumerate(formative_list):
 
-                testName_button = Radiobutton(value='\"[' + item["released_to"] + ", " + item["test_name"] +  ", " + item["date_released"] + ']\"', text=str(i + 1) + ". " + item["test_name"], variable=self.getTestName)
+                testName_button = Radiobutton(value='\"[\'' + item["released_to"] + "\', " + item["test_name"] +  "\', \'"
+                                              + item["date_released"] + '\']\"', text=str(i + 1) + ". " + item["test_name"], variable=self.getTestName)
                 testName_button.grid(row=row_adjuster + 4, column=1, sticky=W)
 
                 released_to_lbl = Label(text=item["released_to"])
@@ -741,9 +743,109 @@ class ReleasedFormativeTest(Frame):
             #Change Class Name and Window Title and pass testName 
             #newPage(self, ClassName, "Window Title", self.lecturerID, testName)
 
+class ReleasedSummativeTest(Frame):
+
+    def __init__(self, master, *args):
+
+        Frame.__init__(self, master)
+        self.grid()
+
+        width = 500
+        height = 500
+        centred_window = centre_app(master, width, height)        
+        master.geometry(centred_window)
+
+        master.grid_columnconfigure(0, weight=1)
+        master.grid_columnconfigure(2, weight=1)
+        master.grid_columnconfigure(5, weight=1)
+        master.grid_columnconfigure(7, weight=1)
+
+        master.grid_rowconfigure(0, weight = 1)
+        master.grid_rowconfigure(2, weight = 2)
+        #master.grid_rowconfigure(6, weight = 1)
+        master.grid_rowconfigure(14, weight=5)
+
+        self.lecturerID = args[0]
+
+        self.display_released_summative()
+
+    def display_released_summative(self):
+
+        summative_list = []
+
+        with open("ReleasedSummative.csv", "r") as csvfile:
+            fieldnames = ["test_name", "test_deadline", "test_duration", "date_released", "released_by", "released_to"]
+            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+            for row in reader:
+                if row["released_by"] == self.lecturerID:
+                    summative_list.append({"test_name": row["test_name"], "released_to": row["released_to"],
+                                           "date_released": row["date_released"], "test_deadline": row["test_deadline"]})
+
+        row_adjuster = 0
+
+        self.getTestName = StringVar()
+        self.getTestName.set(' ')
+
+        if len(summative_list) == 0:
+            empty_testlbl = Label(text="You haven't released any formative test", font=("Arial", 14, "bold"))
+            empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
+            
+        else:
+            for i, item in enumerate(summative_list):
+
+                testName_button = Radiobutton(value='\"[\'' + item["released_to"] + "\', \'" + item["test_name"] +  "\', \'"
+                                              + item["date_released"] + "\', \'" + item["test_deadline"] + '\']\"', text=str(i + 1) + ". " + item["test_name"], variable=self.getTestName)
+                testName_button.grid(row=row_adjuster + 4, column=1, sticky=W)
+
+                released_to_lbl = Label(text=item["released_to"])
+                released_to_lbl.grid(row=row_adjuster + 4, column=3, sticky=NSEW)
+
+                date_released_lbl = Label(text=item["date_released"])
+                date_released_lbl.grid(row=row_adjuster + 4, column=5, sticky=NSEW)
+
+                date_released_lbl = Label(text=item["test_deadline"])
+                date_released_lbl.grid(row=row_adjuster + 4, column=6, sticky=NSEW)
+                
+                row_adjuster += 1
+        
+        goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
+        goBack_button.grid(row=1, column=1, sticky=NSEW)
+
+        view_stats_button = Button(text="View Test Result", width=20, command=self.view_results)
+        view_stats_button.grid(row=1, column=6, sticky=NSEW)
+
+        Heading_lbl = Label(text="Released Summative Test", font=("bold"))
+        Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
+
+        test_name_heading = Label(text="Name of Test", font=("MS", 10, "bold"))
+        test_name_heading.grid(row=3, column=1, columnspan=2, sticky=NSEW)
+
+        released_to_heading = Label(text="Released To", font=("MS", 10, "bold"))
+        released_to_heading.grid(row=3, column=3, sticky=NSEW)
+
+        date_released_heading = Label(text="Date Released", font=("MS", 10, "bold"))
+        date_released_heading.grid(row=3, column=5, sticky=NSEW)
+
+        test_deadline_heading = Label(text="Deadline", font=("MS", 10, "bold"))
+        test_deadline_heading.grid(row=3, column=6, sticky=NSEW) 
+
+    def view_results(self):
+
+        test_name = self.getTestName.get()
+
+        if test_name != ' ':
+            test_name = ast.literal_eval(self.getTestName.get())
+
+        print(test_name)
+
+        if test_name == ' ':
+            tkinter.messagebox.showwarning("Entry Error", "Please select a test in order to view its result")
+            return
                            
 '''
 root = Tk()
 app = LecturerMenu(root)
 root.mainloop()
 '''
+
