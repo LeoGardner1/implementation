@@ -634,7 +634,7 @@ class ReleaseSummative(Frame):
 
         with open('ReleasedSummative.csv', 'r') as csvfile:
 
-            fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
+            fieldnames = ["test_name", "test_deadline", "test_duration", "date_released", "released_by", "released_to"]
             reader = csv.DictReader(csvfile, fieldnames = fieldnames)
 
             for row in reader:
@@ -824,7 +824,7 @@ class ReleasedSummativeTest(Frame):
         self.getTestName.set(' ')
 
         if len(summative_list) == 0:
-            empty_testlbl = Label(text="You haven't released any formative test", font=("Arial", 14, "bold"))
+            empty_testlbl = Label(text="You haven't released any summative test", font=("Arial", 14, "bold"))
             empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
             
         else:
@@ -852,8 +852,8 @@ class ReleasedSummativeTest(Frame):
                 date_released_lbl = Label(text=item["date_released"])
                 date_released_lbl.grid(row=row_adjuster + 4, column=5, sticky=NSEW)
 
-                date_released_lbl = Label(text=item["test_deadline"])
-                date_released_lbl.grid(row=row_adjuster + 4, column=6, sticky=NSEW)
+                test_deadline_lbl = Label(text=item["test_deadline"])
+                test_deadline_lbl.grid(row=row_adjuster + 4, column=6, sticky=NSEW)
                 
 
                 row_adjuster += 1
