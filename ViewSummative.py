@@ -1,6 +1,7 @@
 from tkinter import *
 from globalFunctions import *
 import csv
+import ast
 import os
 import glob
 
@@ -25,18 +26,19 @@ class SummativeMenu(Frame):
         master.grid_columnconfigure(3, weight=1)
         master.grid_rowconfigure(4, weight=1)
 
-        self.student_id = args[0]
+        #self.user_id = args[0]
+        self.user_id = "100001"
         self.createButtons()
 
     def createButtons(self):
 
-        btnViewTest = Button(self, text = "View Summative Tests", command=lambda:newPage(self, ViewSummative, "Summative Test List"))
+        btnViewTest = Button(self, text = "View Summative Tests", command=lambda:newPage(self, ViewSummative, "Summative Test List", self.user_id))
         btnViewTest.grid(row=0, column=0)
 
         btnViewResults = Button(self, text = "View Summative Results")
         btnViewResults.grid(row=1, column=0)
 
-        btnBack = Button(self, text = "Back", command=lambda:newPage(self, StudentMenu, "Student Menu"))
+        btnBack = Button(self, text = "Back", command=lambda:newPage(self, StudentMenu, "Student Menu", self.user_id))
         btnBack.grid(row=2, column=0)
 
 
@@ -63,7 +65,7 @@ class ViewSummative(Frame):
 
         
         #self.user_id = args[0]
-        self.user_id="110000"
+        self.user_id="100001"
         self.CreateList()
     def CreateList(self):
         path = os.getcwd()
@@ -78,7 +80,7 @@ class ViewSummative(Frame):
         Testlist.pack()
 
         for test in tests:
-            if test == 'users.csv' or test == 'lecturers.csv':
+            if test == 'users.csv' or test == 'lecturers.csv' or test == 'studentResults.csv':
                 tests.pop(tests.index(test))
             else:
                 Testlist.insert(END, test[:-4])
@@ -95,21 +97,24 @@ class ViewSummative(Frame):
         if Testlist.size() == 0:
             butTakeTest.config(state=DISABLED)
 
-        butBack = Button(self, text="Back", command=lambda:newPage(self, SummativeMenu, self.user_id, "Summative Menu"))
+        butBack = Button(self, text="Back", command=lambda:newPage(self, SummativeMenu, "Summative Menu", self.user_id))
         butBack.grid()  
 
 
 class StartTest(Frame):
 
-    def __init__(self, master, selection):
-        Frame.__init__(self)
+    def __init__(self, master, *args):
+        Frame.__init__(self, master)
         width = 550
         height = 600
     
         centred_window = centre_app(master, width, height)
         master.geometry(centred_window)
 
-        self.testName = selection
+        scrollBar(master, self)
+
+        self.user_id = args[0]
+        self.testName = args[1]
         self.testQuestions = {"question_no":[], "question":[], "answer_choices":[], "is_correct_answer":[], "answer_feedback":[]}
         self.LoadQuestion()
         self.DisplayQuestion()
@@ -132,11 +137,33 @@ class StartTest(Frame):
 
     def DisplayQuestion(self):
         numOfQuestions = len(self.testQuestions["question_no"])
+        for i in range(0, numOfQuestions):
+            question =  str(i + 1) + ": " + str(self.testQuestions["question"][i])
+            choices = ast.literal_eval(self.testQuestions["answer_choices"][i])
+            choiceA = 'A: ' + choices["A"]
+            choiceB = "B: " + choices["B"]
+            choiceC = "C: " + choices["C"]
+            choiceD = "D: " + choices["D"]
 
-        for i in range(0, numOfQuestions-1):
-            print(self.testQuestions["question_no"][i])
-            #lblQuestion_no = 
+            lblQuestion = Label(self.frame, text=question)
+            lblQuestion.grid()
 
+            radChoiceA = Radiobutton(value=str(i) + "A" ,variable="question" + str(i), text=choiceA, indicatoron=0)
+            radChoiceA.pack()
+
+            radChoiceB = Radiobutton(value=str(i) + "B" ,variable="question" + str(i), text=choiceB, indicatoron=0)
+            radChoiceB.pack()
+
+            radChoiceC = Radiobutton(value=str(i) + "C" ,variable="question" + str(i), text=choiceC, indicatoron=0)
+            radChoiceC.pack()
+
+            radChoiceD = Radiobutton(value=str(i) + "D" ,variable="question" + str(i), text=choiceD, indicatoron=0)
+            radChoiceD.pack()
+
+
+
+    def frameConfigure(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
     
     #def CheckAns(self):
 
