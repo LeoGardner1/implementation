@@ -159,6 +159,9 @@ class FormativeTest(Frame):
     def attempt_formative(self):
 
         test_name = self.getTestName.get()
+        test_type = " formative"
+        test_details = ""
+        test_details = test_name + test_type
 
         if test_name == ' ':
             tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
@@ -274,12 +277,15 @@ class SummativeTest(Frame):
     def attempt_summative(self):
 
         test_name = self.getTestName.get()
+        test_type = " summative"
+        test_details = ""
+        test_details = test_name + test_type 
 
         if test_name == ' ':
             tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
             return
 
-        newPage(self, TestWindow, "Summative Assessment Test", self.studentID, test_name)
+        newPage(self, TestWindow, "Summative Assessment Test", self.studentID, test_details)
 
 class TestWindow(Frame):
 
@@ -298,13 +304,17 @@ class TestWindow(Frame):
 
         self.studentID = args[0]
 
-        self.test_name= args[1]
+        self.test_details = args[1].split()
+
+        self.test_name = self.test_details[0]
+
+        self.test_type = self.test_details[1]
         
         self.test_window()
 
     def test_window(self):
 
-        the_test = {}
+        self.the_test = {}
 
         with open( self.test_name + '.csv', 'r') as csvfile:
             fieldnames = ["question_no", "question", "answer_choices", "is_correct_answer", "answer_feedback"]
@@ -313,11 +323,11 @@ class TestWindow(Frame):
             next(reader, None)
 
             for row in reader:
-                the_test[row["question_no"]] = {"question":row["question"], "answer_choices": ast.literal_eval(row["answer_choices"]),
+                self.the_test[row["question_no"]] = {"question":row["question"], "answer_choices": ast.literal_eval(row["answer_choices"]),
                                                "is_correct_answer": ast.literal_eval(row["is_correct_answer"]),
                                                "answer_feedback": ast.literal_eval(row["answer_feedback"])}
 
-        print(the_test)
+        print(self.the_test)
 
 
 
@@ -326,10 +336,8 @@ class TestWindow(Frame):
         
         testNamelbl = Label(self.frame, text= self.test_name, font=("Arial", 14, "bold"))
         testNamelbl.grid(row=1, column=0, rowspan=3, columnspan=2, sticky=NW)
-        
 
-        submitBtn = Button(self.frame, text="Submit Test", command="")
-        submitBtn.grid(row=1, column=2, sticky=E)
+        
 
         #new_line1 = Label(self.frame, text="-" * 100)
         #new_line1.grid(row=2, column=0, columnspan=3, sticky=EW)
@@ -342,7 +350,14 @@ class TestWindow(Frame):
         self.correctAnsC_entries = []
         self.correctAnsD_entries = []
 
-        for item in the_test.values():
+        self.answersA = []
+        self.answersB = []
+        self.answersC = []
+        self.answersD = []
+
+        
+
+        for item in self.the_test.values():
 
             new_line = Label(self.frame, text="-" * 100)
             new_line.grid(row=rowAdjuster +2, column=0, columnspan=5, sticky=EW)
@@ -385,18 +400,44 @@ class TestWindow(Frame):
 
                 ansD_lbl = Label(self.frame, text=item['answer_choices']['D'], font=("Arial", 10))
                 ansD_lbl.grid(row=rowAdjuster + 8, column=1, sticky=W)
-
+            
             rowAdjuster += 9
             question_no += 1
 
             self.correctAnsA_entries.append(self.correctAnsA)
             self.correctAnsB_entries.append(self.correctAnsB)
             self.correctAnsC_entries.append(self.correctAnsC)
-            self.correctAnsD_entries.append(self.correctAnsD)        
+            self.correctAnsD_entries.append(self.correctAnsD)
 
+            self.answersA.append(item['is_correct_answer']['A'])
+            self.answersB.append(item['is_correct_answer']['B'])
+            self.answersC.append(item['is_correct_answer']['C'])
+            self.answersD.append(item['is_correct_answer']['D'])
+
+        self.numOfQuestions = question_no - 1
+
+        submitBtn = Button(self.frame, text="Submit Test", command=lambda:self.CheckAnswers())
+        submitBtn.grid(row=1, column=2, sticky=E)
     def frameConfigure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))   
-                        
+
+    def CheckAnswers(self):
+        self.totalMark = 0
+        for i in range(0, self.numOfQuestions):
+            if self.correctAnsA_entries[i].get() == True:
+                if self.correctAnsA_entries[i].get() == self.answersA[i]:
+                    self.totalMark += 1
+            if self.correctAnsB_entries[i].get() == True:
+                if self.correctAnsB_entries[i].get() == self.answersB[i]:
+                    self.totalMark += 1
+            if self.correctAnsC_entries[i].get() == True:
+                if self.correctAnsC_entries[i].get() == self.answersC[i]:
+                    self.totalMark += 1
+            if self.correctAnsD_entries[i].get() == True:
+                if self.correctAnsD_entries[i].get() == self.answersD[i]:
+                    self.totalMark += 1
+        if self.test_type == "summative":
+            print("summative")
 
 class AttemptFormative(Frame):
 

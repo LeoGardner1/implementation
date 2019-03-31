@@ -6,6 +6,3 @@ userID,password,surName,firstName,userType
 100004,Abcdef4,Fifth,Five,Lecturer
 100005,Abcdef5,Sixth,Six,Student
 100006,Abcdef6,Seventh,Seven,Lecturer
-100007,Eight,Eight,Student
-100009,Tenth,Ten,Student
-100011,Twelfth,Twelve,Student
