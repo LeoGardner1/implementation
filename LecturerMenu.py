@@ -838,14 +838,14 @@ class DisplayFormativeStatistics(Frame):
 			
 			question_most_correct = max(no_correct_per_q.items(), key=operator.itemgetter(1))[0]
 			question_least_correct = min(no_correct_per_q.items(), key=operator.itemgetter(1))[0]
-			ave_score = sum_score / len(submissions)
-			ave_percentage_attainded = (ave_score / max_mark) * 100
-			ave_no_of_attempts = sum_attempts / len(submissions)
+			ave_score = round(sum_score / len(submissions), 1)
+			ave_percentage_attainded = round((ave_score / max_mark) * 100, 1)
+			ave_no_of_attempts = round(sum_attempts / len(submissions), 1)
 			
 			percent_correct_per_q = {}
 			for question, number in no_correct_per_q.items():
 				percent_correct = (number / len(submissions)) * 100
-				percent_correct_per_q[question] = percent_correct
+				percent_correct_per_q[question] = round(percent_correct, 1)
 			
 			no_submissions_lbl = Label(text = "Number of submissions recieved:   {length}".format(length=len(submissions)), font=("Arial", 10))
 			no_submissions_lbl.grid(row = 3, column = 1, sticky = NSEW)
