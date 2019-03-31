@@ -809,7 +809,7 @@ class DisplayFormativeStatistics(Frame):
 		row_adjuster = 0
 		
 		test_name_title_lbl = Label(text=self.test_name, font=("Arial", 14, "bold"))
-		test_name_title_lbl.grid(row = 1, column = 3, sticky = NSEW)
+		test_name_title_lbl.grid(row = 2, column = 1, columnspan=6, sticky = NSEW)
 		
 		if len(submissions) == 0:
 			empty_testlbl = Label(text="There have been no submissions made for this test.", font=("Arial", 14, "bold"))
@@ -848,33 +848,33 @@ class DisplayFormativeStatistics(Frame):
 				percent_correct_per_q[question] = percent_correct
 			
 			no_submissions_lbl = Label(text = "Number of submissions recieved:   {length}".format(length=len(submissions)), font=("Arial", 10))
-			no_submissions_lbl.grid(row = 2, column = 0, sticky = NSEW)
+			no_submissions_lbl.grid(row = 3, column = 1, sticky = NSEW)
 			
 			ave_attempts_lbl = Label(text = "Average number of attempts:   {attempts}".format(attempts=ave_no_of_attempts), font=("Arial",10))
-			ave_attempts_lbl.grid(row = 3, column = 0, sticky = NSEW)
+			ave_attempts_lbl.grid(row = 4, column = 1, sticky = NSEW)
 			
 			ave_score_lbl = Label(text = "Average score in test:   {score}/{max}  ({percent}%)".format(score=ave_score, max=max_mark, percent=ave_percentage_attainded), font=("Arial",10))
-			ave_score_lbl.grid(row = 4, column = 0, sticky = NSEW)
+			ave_score_lbl.grid(row = 5, column = 1, sticky = NSEW)
 			
 			most_correct_lbl = Label(text = "Qustion with most correct answers:   {question}".format(question=question_most_correct), font=("Arial",10))
-			most_correct_lbl.grid(row = 5, column = 0, sticky = NSEW)
+			most_correct_lbl.grid(row = 6, column = 1, sticky = NSEW)
 			
 			least_correct_lbl = Label(text = "Question with least correct answers:   {question}".format(question=question_least_correct), font=("Arial",10))
-			least_correct_lbl.grid(row = 6, column = 0, sticky = NSEW)
+			least_correct_lbl.grid(row = 7, column = 1, sticky = NSEW)
 			
 			percent_correct_lbl = Label(text = "Percent of students who answered each question correctly:", font=("Arial",10))
-			percent_correct_lbl.grid(row = 7, column = 0, sticky = NSEW)
-			row_adjuster = 8
+			percent_correct_lbl.grid(row = 8, column = 1, sticky = NSEW)
+			row_adjuster = 9
 			for question, percent in percent_correct_per_q.items():
-				percentage_for_q_lbl = Label(text = "{q}:  {p}".format(q=question, p=percent), font=("Arial",10))
-				percentage_for_q_lbl.grid(row = row_adjuster, column = 0, sticky = NSEW)
+				percentage_for_q_lbl = Label(text = "{q}:  {p}%".format(q=question, p=percent), font=("Arial",10))
+				percentage_for_q_lbl.grid(row = row_adjuster, column = 1, sticky = NSEW)
 				
 				row_adjuster += 1
 			
-			home_but = Button(text="Back to Homepage", width=10, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
-			home_but.grid(row=0, column=0, sticky=NSEW)
-			back_to_formative_but = Button(self, text="Back to Formative Tests", height=2, width=10, command=lambda:newPage(self, ReleasedFormativeTest, "Released Formative Test", self.lecturerID))
-			back_to_formative_but.grid(row=0, column=1)
+			home_but = Button(text="Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
+			home_but.grid(row=1, column=1, sticky=NSEW)
+			back_to_formative_but = Button(self, text="Back to Formative Tests", width=20, command=lambda:newPage(self, ReleasedFormativeTest, "Released Formative Test", self.lecturerID))
+			back_to_formative_but.grid(row=1, column=6)
 			
 class ReleasedSummativeTest(Frame):
 
