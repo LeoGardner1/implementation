@@ -1,1 +1,7 @@
+<<<<<<< HEAD
 test_name,student_maxAttempt,test_duration,date_released,released_by,released_to
+=======
+test_name,student_maxAttempt,test_duration,date_released,released_by,released_to
+,,,,,
+FormativeTest1,5,60,01/01/2019,100000,Group 1
+>>>>>>> 3963914cbe9debc5273bee8c209d6cca4dcc9811

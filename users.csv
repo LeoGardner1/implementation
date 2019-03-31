@@ -5,4 +5,11 @@ userID,password,surName,firstName,userType
 100003,Abcdef3,Fourth,Four,Student
 100004,Abcdef4,Fifth,Five,Lecturer
 100005,Abcdef5,Sixth,Six,Student
+<<<<<<< HEAD
 100006,Abcdef6,Seventh,Seven,Lecturer
+=======
+100006,Abcdef6,Seventh,Seven,Lecturer
+100007,Abcdef7,Eighth,Eight,Student
+100009,Abcdef9,Nineth,Nine,Student
+100011,Abcdef11,Eleventh,Eleven,Student
+>>>>>>> 3963914cbe9debc5273bee8c209d6cca4dcc9811
