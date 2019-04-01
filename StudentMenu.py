@@ -491,8 +491,8 @@ class TestWindow(Frame):
                 if (row["studentID"] == self.studentID) and (row["test_name"] == self.test_name):
                     testTaken = True
                     errormsg += "You have already taken this test!"
-                    tkinter.messagebox.showinfo("Test Submission", errormsg)
-
+        if errormsg != "":
+            tkinter.messagebox.showinfo("Test Submission", errormsg)
         if (testTaken == False) and (pastDeadline == False):
             with open('studentResults.csv', 'a') as results:
                 fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
@@ -500,6 +500,7 @@ class TestWindow(Frame):
                 writer.writerow({"studentID": self.studentID, "studentGroup": self.group, "test_name": self.test_name, "date_released": self.date_released, "deadline": self.deadline, "total_score": self.totalMark, "total_question": self.totalQuestions, "student_f_name": self.forename, "student_l_name": self.surname})
                 tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
         newPage(self, StudentMenu, "Student Menu", self.studentID)
+
     def WriteFormativeResult(self):
         test_file = "ReleasedFormative.csv"
         print(self.totalMark)
