@@ -493,7 +493,7 @@ class TestWindow(Frame):
                     errormsg += "You have already taken this test!"
         if errormsg != "":
             tkinter.messagebox.showinfo("Test Submission", errormsg)
-        if (testTaken == False) and (pastDeadline == False):
+        if (testTaken == False) or (pastDeadline == False):
             with open('studentResults.csv', 'a') as results:
                 fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
                 writer = csv.DictWriter(results, fieldnames)
