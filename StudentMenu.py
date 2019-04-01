@@ -8,7 +8,7 @@ from tempfile import NamedTemporaryFile
 import shutil
 import ast
 import datetime
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import time
 import os
 from tkinter import ttk
@@ -167,7 +167,7 @@ class FormativeTest(Frame):
             tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
             return
 
-        newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_name)
+        newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details)
     
 
 class SummativeTest(Frame):
@@ -279,7 +279,7 @@ class SummativeTest(Frame):
         test_name = self.getTestName.get()
         test_type = " summative"
         test_details = ""
-        test_details = test_name + test_type 
+        test_details = test_name + test_type
 
         if test_name == ' ':
             tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
@@ -423,6 +423,7 @@ class TestWindow(Frame):
 
     def CheckAnswers(self):
         self.totalMark = 0
+        self.totalQuestions = 0
         for i in range(0, self.numOfQuestions):
             if self.correctAnsA_entries[i].get() == True:
                 if self.correctAnsA_entries[i].get() == self.answersA[i]:
@@ -436,8 +437,72 @@ class TestWindow(Frame):
             if self.correctAnsD_entries[i].get() == True:
                 if self.correctAnsD_entries[i].get() == self.answersD[i]:
                     self.totalMark += 1
+            self.totalQuestions += 1
         if self.test_type == "summative":
-            print("summative")
+            self.WriteSummativeResult()
+        else:
+            self.WriteFormativeResult()
+
+    def GetStuDetails(self):
+        with open("students.csv", "r") as students:
+            fieldnames = ["studentID", "first_name", "last_name", "student_group"]
+            reader = csv.DictReader(students, fieldnames=fieldnames)
+
+            for row in reader:
+                if row["studentID"] == self.studentID:
+                    self.group = row["student_group"]
+                    self.forename = row["first_name"]
+                    self.surname = row["last_name"]
+
+    def GetSumTestDetails(self):
+        with open("ReleasedSummative.csv", "r") as tests:
+            fieldnames = ["test_name", "test_deadline", "test_duration", "date_released", "released_by", "released_to"]
+            reader = csv.DictReader(tests, fieldnames=fieldnames)
+            for row in reader:
+                if row["test_name"] == self.test_name:
+                    self.date_released = row["date_released"]
+                    self.deadline = row["test_deadline"]
+
+    def GetFormTestDetails(self):
+        with open("ReleasedSummative.csv", "r") as tests:
+            fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
+            reader = csv.DictReader(tests, fieldnames=fieldnames)
+            for row in reader:
+                if row["test_name"] == self.test_name:
+                    self.date_released = row["date_released"]
+
+
+    def WriteSummativeResult(self):
+        self.GetStuDetails()
+        self.GetSumTestDetails()
+        testTaken = False
+        pastDeadline = False
+        errormsg = ""
+        deadline = datetime.strptime(self.deadline, "%d/%m/%Y")
+        currentDate = datetime.today()
+        if currentDate > deadline:
+            pastDeadline = True
+            errormsg += "The deadline for this test has passed! "
+        print(currentDate)
+        with open('studentResults.csv', 'r') as results:
+            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+            reader = csv.DictReader(results, fieldnames)
+            for row in reader:
+                if (row["studentID"] == self.studentID) and (row["test_name"] == self.test_name):
+                    testTaken = True
+                    errormsg += "You have already taken this test!"
+                    tkinter.messagebox.showinfo("Test Submission", errormsg)
+
+        if (testTaken == False) and (pastDeadline == False):
+            with open('studentResults.csv', 'a') as results:
+                fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+                writer = csv.DictWriter(results, fieldnames)
+                writer.writerow({"studentID": self.studentID, "studentGroup": self.group, "test_name": self.test_name, "date_released": self.date_released, "deadline": self.deadline, "total_score": self.totalMark, "total_question": self.totalQuestions, "student_f_name": self.forename, "student_l_name": self.surname})
+                tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
+        newPage(self, StudentMenu, "Student Menu", self.studentID)
+    def WriteFormativeResult(self):
+        test_file = "ReleasedFormative.csv"
+        print(self.totalMark)
 
 class AttemptFormative(Frame):
 
