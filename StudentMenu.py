@@ -281,11 +281,34 @@ class SummativeTest(Frame):
         test_details = ""
         test_details = test_name + test_type
 
-        if test_name == ' ':
-            tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
-            return
+        testTaken = False
+        pastDeadline = False
+        errormsg = ""
 
-        newPage(self, TestWindow, "Summative Assessment Test", self.studentID, test_details)
+        with open("ReleasedSummative.csv", "r") as csvfile:
+            fieldnames = ["test_name", "test_deadline", "test_duration", "date_released", "released_by", "released_to"]
+            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+            for row in reader:
+                if row["test_name"] == test_name:
+                    deadline = datetime.strptime(row["test_deadline"], "%d/%m/%Y")
+        currentDate = datetime.today()
+        if currentDate > deadline:
+            pastDeadline = True
+            errormsg += "The deadline for this test has passed! "
+        with open('studentResults.csv', 'r') as results:
+            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+            reader = csv.DictReader(results, fieldnames)
+            for row in reader:
+                if (row["studentID"] == self.studentID) and (row["test_name"] == test_name):
+                    testTaken = True
+                    errormsg += "You have already taken this test! "
+            if test_name == ' ':
+                errormsg += "Please select a test to attempt!"
+                return
+        if errormsg != "":
+            tkinter.messagebox.showinfo("Test Submission", errormsg)
+        if (testTaken == False) and (pastDeadline == False):
+            newPage(self, TestWindow, "Summative Assessment Test", self.studentID, test_details)
 
 class TestWindow(Frame):
 
@@ -424,7 +447,10 @@ class TestWindow(Frame):
     def CheckAnswers(self):
         self.totalMark = 0
         self.totalQuestions = 0
+        allAnswered = True
         for i in range(0, self.numOfQuestions):
+            if (self.correctAnsA_entries[i].get() == False) and (self.correctAnsB_entries[i].get() == False) and (self.correctAnsC_entries[i].get() == False) and (self.correctAnsD_entries[i].get() == False):
+                allAnswered = False
             if self.correctAnsA_entries[i].get() == True:
                 if self.correctAnsA_entries[i].get() == self.answersA[i]:
                     self.totalMark += 1
@@ -438,10 +464,14 @@ class TestWindow(Frame):
                 if self.correctAnsD_entries[i].get() == self.answersD[i]:
                     self.totalMark += 1
             self.totalQuestions += 1
-        if self.test_type == "summative":
-            self.WriteSummativeResult()
+
+        if allAnswered == True:
+            if self.test_type == "summative":
+                self.WriteSummativeResult()
+            else:
+                self.WriteFormativeResult()
         else:
-            self.WriteFormativeResult()
+            tkinter.messagebox.showinfo("Test Submission", "All questions must be attempted!")
 
     def GetStuDetails(self):
         with open("students.csv", "r") as students:
@@ -475,30 +505,12 @@ class TestWindow(Frame):
     def WriteSummativeResult(self):
         self.GetStuDetails()
         self.GetSumTestDetails()
-        testTaken = False
-        pastDeadline = False
-        errormsg = ""
-        deadline = datetime.strptime(self.deadline, "%d/%m/%Y")
-        currentDate = datetime.today()
-        if currentDate > deadline:
-            pastDeadline = True
-            errormsg += "The deadline for this test has passed! "
-        print(currentDate)
-        with open('studentResults.csv', 'r') as results:
+        
+        with open('studentResults.csv', 'a') as results:
             fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
-            reader = csv.DictReader(results, fieldnames)
-            for row in reader:
-                if (row["studentID"] == self.studentID) and (row["test_name"] == self.test_name):
-                    testTaken = True
-                    errormsg += "You have already taken this test!"
-        if errormsg != "":
-            tkinter.messagebox.showinfo("Test Submission", errormsg)
-        if (testTaken == False) or (pastDeadline == False):
-            with open('studentResults.csv', 'a') as results:
-                fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
-                writer = csv.DictWriter(results, fieldnames)
-                writer.writerow({"studentID": self.studentID, "studentGroup": self.group, "test_name": self.test_name, "date_released": self.date_released, "deadline": self.deadline, "total_score": self.totalMark, "total_question": self.totalQuestions, "student_f_name": self.forename, "student_l_name": self.surname})
-                tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
+            writer = csv.DictWriter(results, fieldnames)
+            writer.writerow({"studentID": self.studentID, "studentGroup": self.group, "test_name": self.test_name, "date_released": self.date_released, "deadline": self.deadline, "total_score": self.totalMark, "total_question": self.totalQuestions, "student_f_name": self.forename, "student_l_name": self.surname})
+            tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
         newPage(self, StudentMenu, "Student Menu", self.studentID)
 
     def WriteFormativeResult(self):
