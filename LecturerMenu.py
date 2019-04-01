@@ -14,6 +14,8 @@ import os
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 import operator
+import string
+
 
 
 class LecturerMenu(Frame):
@@ -1018,16 +1020,21 @@ class DisplayStudentPerformance(Frame):
 		studentList =[]
 
 		with open('studentResults.csv', 'r') as csvfile:
-
 			fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
 			reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+			test_name_list = self.test_name.split()
+
+			group = test_name_list[0].translate(str.maketrans('', '', string.punctuation))
+			groupNum = test_name_list[1].translate(str.maketrans('', '', string.punctuation))
+			testNameTitle = test_name_list[2].translate(str.maketrans('', '', string.punctuation))
+
 			for row in reader:
-				if self.test_name[2:9] == row["studentGroup"]:
+				if group + " " + groupNum == row["studentGroup"]:
 					studentList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"] })
 
 		row_adjuster = 0
 
-		test_name_title_lbl = Label(text=self.test_name[13:17])
+		test_name_title_lbl = Label(text=testNameTitle)
 		test_name_title_lbl.grid(row = 1, column = 2, sticky = NSEW)
 
 		if len(studentList) == 0:
@@ -1038,11 +1045,42 @@ class DisplayStudentPerformance(Frame):
 			for i, item in enumerate(studentList):
 				released_to_lbl = Label(text=item["student_f_name"] + " " + item["student_l_name"]  + " Mark: " + item["total_score"]  + "/" + item["total_question"]  )
 				released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
-				row_adjuster += 1
-				# group_lbl = Label(text=item["studentGroup"])
-				# group_lbl.grid(row=row_adjuster + 4, column=3, sticky=NSEW)
-				# row_adjuster += 1
 
+				released_to_but = Button(text="Student", width=20, command=lambda:newPage(self, DisplayIndividualStudentPerformance, "Individual Student Performance", self.lecturerID) )
+				released_to_but.grid(row=row_adjuster + 4, column=3, sticky=NSEW)
+				row_adjuster += 1
+
+
+
+		goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
+		goBack_button.grid(row=1, column=1, sticky=NSEW)
+
+
+class DisplayIndividualStudentPerformance(Frame):
+	def __init__(self, master, *args):
+
+		Frame.__init__(self, master)
+		self.grid()
+
+		width = 500
+		height = 500
+		centred_window = centre_app(master, width, height)
+		master.geometry(centred_window)
+
+		master.grid_columnconfigure(0, weight=1)
+		master.grid_columnconfigure(2, weight=1)
+		master.grid_columnconfigure(5, weight=1)
+		master.grid_columnconfigure(7, weight=1)
+
+		master.grid_rowconfigure(0, weight = 1)
+		master.grid_rowconfigure(2, weight = 2)
+		#master.grid_rowconfigure(6, weight = 1)
+		master.grid_rowconfigure(14, weight=5)
+		self.test_name = args[1]
+		self.lecturerID = args[0]
+		self.display()
+	def display(self):
+		studentList =[]
 
 		goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
 		goBack_button.grid(row=1, column=1, sticky=NSEW)
