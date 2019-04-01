@@ -1029,16 +1029,14 @@ class DisplayStudentPerformance(Frame):
 			testNameTitle = test_name_list[2].translate(str.maketrans('', '', string.punctuation))
 
 			for row in reader:
-				if group + " " + groupNum == row["studentGroup"]:
+				if group + " " + groupNum == row["studentGroup"] and testNameTitle == row["test_name"]:
 					studentList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"] })
 
 		row_adjuster = 0
 
-		test_name_title_lbl = Label(text=testNameTitle)
-		test_name_title_lbl.grid(row = 1, column = 2, sticky = NSEW)
 
 		if len(studentList) == 0:
-			empty_testlbl = Label(text="You haven't released any formative test", font=("Arial", 14, "bold"))
+			empty_testlbl = Label(text="No students have taken this test yet.", font=("Arial", 14, "bold"))
 			empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
 
 		else:
@@ -1046,14 +1044,15 @@ class DisplayStudentPerformance(Frame):
 				released_to_lbl = Label(text=item["student_f_name"] + " " + item["student_l_name"]  + " Mark: " + item["total_score"]  + "/" + item["total_question"]  )
 				released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
 
-				released_to_but = Button(text="Student", width=20, command=lambda:newPage(self, DisplayIndividualStudentPerformance, "Individual Student Performance", self.lecturerID) )
+				released_to_but = Button(text="View Student", width=15, command=lambda:newPage(self, DisplayIndividualStudentPerformance, "Individual Student Performance", self.lecturerID, item) )
 				released_to_but.grid(row=row_adjuster + 4, column=3, sticky=NSEW)
 				row_adjuster += 1
 
-
-
 		goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
 		goBack_button.grid(row=1, column=1, sticky=NSEW)
+
+		Heading_lbl = Label(text=testNameTitle, font=("bold"))
+		Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
 
 
 class DisplayIndividualStudentPerformance(Frame):
@@ -1076,14 +1075,37 @@ class DisplayIndividualStudentPerformance(Frame):
 		master.grid_rowconfigure(2, weight = 2)
 		#master.grid_rowconfigure(6, weight = 1)
 		master.grid_rowconfigure(14, weight=5)
-		self.test_name = args[1]
+		self.student_details = args[1]
 		self.lecturerID = args[0]
 		self.display()
-	def display(self):
-		studentList =[]
 
+	def display(self):
+		row_adjuster = 0
 		goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
 		goBack_button.grid(row=1, column=1, sticky=NSEW)
+		firstName = list(self.student_details.values())[5]
+		secondName = list(self.student_details.values())[6]
+		Heading_lbl = Label(text=firstName + " " + secondName, font=("bold"))
+		Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
+
+		testList=[]
+		with open('studentResults.csv', 'r') as csvfile:
+			fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+			reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+			for row in reader:
+				if row["student_f_name"] == firstName:
+					testList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"] })
+
+
+		if len(testList) == 0:
+			empty_testlbl = Label(text="This student has taken no summative tests yet.", font=("Arial", 14, "bold"))
+			empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
+		else:
+			for i, item in enumerate(testList):
+				released_to_lbl = Label(text=item["test_name"] + " "  + " Mark: " + item["total_score"]  + "/" + item["total_question"]  )
+				released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
+
 
 
 root = Tk()
