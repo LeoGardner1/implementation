@@ -14,6 +14,8 @@ import os
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 import operator
+import string
+
 
 
 class LecturerMenu(Frame):
