@@ -1,4 +1,5 @@
 
+
 from tkinter import *
 from globalFunctions import *
 import csv
@@ -13,7 +14,7 @@ import time
 import os
 from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
-
+##
 class StudentMenu(Frame):
 
     def __init__(self, master, *args):
@@ -23,9 +24,9 @@ class StudentMenu(Frame):
 
         width = 500
         height = 500
-        centred_window = centre_app(master, width, height)        
+        centred_window = centre_app(master, width, height)
         master.geometry(centred_window)
-        
+
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight = 1)
 
@@ -61,7 +62,7 @@ class FormativeTest(Frame):
 
         width = 500
         height = 500
-        centred_window = centre_app(master, width, height)        
+        centred_window = centre_app(master, width, height)
         master.geometry(centred_window)
 
         master.grid_columnconfigure(0, weight=1)
@@ -88,7 +89,7 @@ class FormativeTest(Frame):
             reader = csv.reader(students)
 
             next(reader, None)
-            
+
             for row in reader:
                 if row[0] == self.studentID:
                     student_group = row[3]
@@ -123,7 +124,7 @@ class FormativeTest(Frame):
         if len(formative_test_list) == 0:
             empty_testlbl = Label(text="No Test Available to Attempt", font=("Arial", 14, "bold"))
             empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
-            
+
         else:
             test_name_heading = Label(text="Name of Test", font=("MS", 10, "bold"))
             test_name_heading.grid(row=3, column=1, columnspan=2, sticky=NSEW)
@@ -133,7 +134,7 @@ class FormativeTest(Frame):
 
             date_released_heading = Label(text="Date Released", font=("MS", 10, "bold"))
             date_released_heading.grid(row=3, column=6, sticky=NSEW)
-            
+
             for i, item in enumerate(formative_test_list):
 
                 testName_button = Radiobutton(value=item["test_name"], text=str(i + 1) + ". " + item["test_name"], variable=self.getTestName)
@@ -144,9 +145,9 @@ class FormativeTest(Frame):
 
                 date_released_lbl = Label(text=item["date_released"])
                 date_released_lbl.grid(row=row_adjuster + 4, column=6, sticky=NSEW)
-                
+
                 row_adjuster += 1
-        
+
         goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, StudentMenu, "Student Page", self.studentID))
         goBack_button.grid(row=1, column=1, sticky=NSEW)
 
@@ -163,12 +164,43 @@ class FormativeTest(Frame):
         test_details = ""
         test_details = test_name + test_type
 
-        if test_name == ' ':
-            tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
-            return
+        testTaken = False
+ 
+        errormsg = ""
 
-        newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details)
-    
+
+        with open("ReleasedFormative.csv", "r") as csvfile:
+            fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
+            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+##            for row in reader:
+##                if row["test_name"] == test_name:
+##                    deadline = datetime.strptime(row["test_deadline"], "%d/%m/%Y")
+##        currentDate = datetime.today()
+##        if currentDate > deadline:
+##            pastDeadline = True
+##            errormsg += "The deadline for this test has passed! "
+        with open('formativeStudentResults.csv', 'r') as results:
+            fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_scores", "total_question", "answered_correctly"]
+            reader = csv.DictReader(results, fieldnames)
+            for row in reader:
+                if (row["studentID"] == self.studentID) and (row["test_name"] == test_name):
+                    testTaken = True
+                    errormsg += "You have already taken this test! "
+            if test_name == ' ':
+                errormsg += "Please select a test to attempt!"
+                return
+        if errormsg != "":
+            tkinter.messagebox.showinfo("Test Submission", errormsg)
+        if (testTaken == False):
+            newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details)
+
+       
+##        if test_name == ' ':
+##            tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
+##            return
+##
+##        newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details)
+
 
 class SummativeTest(Frame):
 
@@ -179,7 +211,7 @@ class SummativeTest(Frame):
 
         width = 500
         height = 500
-        centred_window = centre_app(master, width, height)        
+        centred_window = centre_app(master, width, height)
         master.geometry(centred_window)
 
         master.grid_columnconfigure(0, weight=1)
@@ -206,7 +238,7 @@ class SummativeTest(Frame):
             reader = csv.reader(students)
 
             next(reader, None)
-            
+
             for row in reader:
                 if row[0] == self.studentID:
                     student_group = row[3]
@@ -240,7 +272,7 @@ class SummativeTest(Frame):
         if len(summative_test_list) == 0:
             empty_testlbl = Label(text="No Test Available to Attempt", font=("Arial", 14, "bold"))
             empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
-            
+
         else:
             test_name_heading = Label(text="Name of Test", font=("MS", 10, "bold"))
             test_name_heading.grid(row=3, column=1, columnspan=2, sticky=NSEW)
@@ -250,7 +282,7 @@ class SummativeTest(Frame):
 
             test_deadline_heading = Label(text="Deadline", font=("MS", 10, "bold"))
             test_deadline_heading.grid(row=3, column=6, sticky=NSEW)
-            
+
             for i, item in enumerate(summative_test_list):
 
                 testName_button = Radiobutton(value=item["test_name"], text=str(i + 1) + ". " + item["test_name"], variable=self.getTestName)
@@ -261,10 +293,10 @@ class SummativeTest(Frame):
 
                 test_deadline_lbl = Label(text=item["test_deadline"])
                 test_deadline_lbl.grid(row=row_adjuster + 4, column=6, sticky=NSEW)
-                
+
 
                 row_adjuster += 1
-        
+
         goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, StudentMenu, "Student Page", self.studentID))
         goBack_button.grid(row=1, column=1, sticky=NSEW)
 
@@ -332,7 +364,7 @@ class TestWindow(Frame):
         self.test_name = self.test_details[0]
 
         self.test_type = self.test_details[1]
-        
+
         self.test_window()
 
     def test_window(self):
@@ -356,11 +388,11 @@ class TestWindow(Frame):
 
         new_line0 = Label(self.frame, text="-" * 100)
         new_line0.grid(row=0, column=0, columnspan=3, sticky=EW)
-        
+
         testNamelbl = Label(self.frame, text= self.test_name, font=("Arial", 14, "bold"))
         testNamelbl.grid(row=1, column=0, rowspan=3, columnspan=2, sticky=NW)
 
-        
+
 
         #new_line1 = Label(self.frame, text="-" * 100)
         #new_line1.grid(row=2, column=0, columnspan=3, sticky=EW)
@@ -378,13 +410,13 @@ class TestWindow(Frame):
         self.answersC = []
         self.answersD = []
 
-        
+
 
         for item in self.the_test.values():
 
             new_line = Label(self.frame, text="-" * 100)
             new_line.grid(row=rowAdjuster +2, column=0, columnspan=5, sticky=EW)
-            
+
             question_no_lbl = Label(self.frame, text="Question " + str(question_no) + ":", font=("Arial", 12, "bold"))
             question_no_lbl.grid(row= rowAdjuster + 3, column=0, sticky=EW)
 
@@ -409,7 +441,7 @@ class TestWindow(Frame):
             ansB_lbl.grid(row=rowAdjuster + 6, column=1, sticky=W)
 
             if item['answer_choices']['C'] != "":
-                
+
                 ansC = Checkbutton(self.frame, text="C.", font=("Arial", 10, "bold"), variable=self.correctAnsC)
                 ansC.grid(row=rowAdjuster + 7, column=0, sticky=E)
 
@@ -423,7 +455,7 @@ class TestWindow(Frame):
 
                 ansD_lbl = Label(self.frame, text=item['answer_choices']['D'], font=("Arial", 10))
                 ansD_lbl.grid(row=rowAdjuster + 8, column=1, sticky=W)
-            
+
             rowAdjuster += 9
             question_no += 1
 
@@ -442,7 +474,7 @@ class TestWindow(Frame):
         submitBtn = Button(self.frame, text="Submit Test", command=lambda:self.CheckAnswers())
         submitBtn.grid(row=1, column=2, sticky=E)
     def frameConfigure(self, event):
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))   
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def CheckAnswers(self):
         self.totalMark = 0
@@ -505,7 +537,7 @@ class TestWindow(Frame):
     def WriteSummativeResult(self):
         self.GetStuDetails()
         self.GetSumTestDetails()
-        
+
         with open('studentResults.csv', 'a') as results:
             fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
             writer = csv.DictWriter(results, fieldnames)
@@ -514,9 +546,24 @@ class TestWindow(Frame):
         newPage(self, StudentMenu, "Student Menu", self.studentID)
 
     def WriteFormativeResult(self):
+##
+##        self.GetStuDetails()
+##        self.GetSumTestDetails()
+        
+        with open('formativeStudentResults.csv', 'a') as results:
+            fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_scores", "total_question", "answered_correctly"]
+            writer = csv.DictWriter(results, fieldnames)
+            writer.writerow({"test_name": self.test_name, "studentID": self.studentID, "studentGroup": self.group, "date_released": self.date_released, "attempts_made": self.attempts_made,
+                             "total_scores": self.totalMark, "total_question": self.totalQuestions, "answered_correctly": self.answered_correctly})
+            tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
+        newPage(self, StudentMenu, "Student Menu", self.studentID)
+        
         test_file = "ReleasedFormative.csv"
         print(self.totalMark)
 
+
+
+   
 class AttemptFormative(Frame):
 
     pass
@@ -530,3 +577,4 @@ root = Tk()
 app = StudentMenu(root)
 root.mainloop()
 '''
+
