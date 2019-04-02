@@ -49,7 +49,7 @@ class StudentMenu(Frame):
         new_line1 = Label(self, text=" ")
         new_line1.grid(row=4, columnspan=2, sticky=NSEW)
 
-        butMyResults = Button(self, text="My Test Results", height=2, width=22, command=lambda:newPage(self, ReleasedFormativeTest, "Released Formative Test", self.studentID))
+        butMyResults = Button(self, text="My Test Results", height=2, width=22, command=lambda:newPage(self, ViewMyResults, "My Results", self.studentID))
         butMyResults.grid(row=5, column=1)
 
 class FormativeTest(Frame):
@@ -563,7 +563,7 @@ class TestWindow(Frame):
         newPage(self, ResultsWindow, "Your Test Result", self.studentID, self.test_data)
 
     def WriteFormativeResult(self):
-##
+
         self.GetStuDetails()
         self.GetFormTestDetails()
         
@@ -701,7 +701,7 @@ class ResultsWindow(Frame):
             correct = ""
 
             for i in range(0, len(choices)):
-                addstring = "Comment "choices[i] + ": " + item['answer_feedback'][choices[i]]
+                addstring = "Comment " + choices[i] + ": " + item['answer_feedback'][choices[i]]
                 if item['is_correct_answer'][choices[i]] == False:
                     incorrect += addstring
                 else:
@@ -724,6 +724,278 @@ class ResultsWindow(Frame):
     def frameConfigure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
+class ViewMyResults(Frame):
+    def __init__(self, master, *args):
+
+        Frame.__init__(self, master)
+        #self.grid()
+
+        width = 500
+        height = 500
+        centred_window = centre_app(master, width, height)        
+        master.geometry(centred_window)
+
+        master.grid_columnconfigure(0, weight=1)
+        master.grid_columnconfigure(2, weight=1)
+        master.grid_columnconfigure(5, weight=1)
+        master.grid_columnconfigure(7, weight=1)
+
+        master.grid_rowconfigure(0, weight = 1)
+        master.grid_rowconfigure(2, weight = 2)
+        #master.grid_rowconfigure(6, weight = 1)
+        master.grid_rowconfigure(14, weight=5)
+
+        #scrollBar(master, self)
+
+        self.studentID = args[0]
+
+        self.ShowTestList()
+
+    def ShowTestList(self):
+        summative_test_list = []
+
+        check_if_exist = os.path.isfile("studentResults.csv")
+
+        if not check_if_exist:
+            with open('studentResults.csv', 'w') as csvfile:
+
+                fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                writer.writeheader()
+
+        with open("studentResults.csv", "r") as csvfile:
+            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+            for row in reader:
+                if row["studentID"] == self.studentID:
+                    summative_test_list.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"], "date_released": row["date_released"], "deadline": row["deadline"], "total_score": row["total_score"], "total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"]})
+                    self.forename = row["student_f_name"]
+                    self.surname = row["student_l_name"]
+        row_adjuster = 0
+
+        self.getSumTestName = StringVar()
+        self.getSumTestName.set(' ')
+
+        if len(summative_test_list) == 0:
+            empty_sumtestlbl = Label(text="No Summative Tests Attempted", font=("Arial", 14, "bold"))
+            empty_sumtestlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
+            
+        else:
+            sumtest_name_heading = Label(text="Name of Test", font=("MS", 10, "bold"))
+            sumtest_name_heading.grid(row=3, column=1, columnspan=2, sticky=NSEW)
+
+            sumdate_released_heading = Label(text="Date Released", font=("MS", 10, "bold"))
+            sumdate_released_heading.grid(row=3, column=4, sticky=NSEW)
+
+            test_deadline_heading = Label(text="Deadline", font=("MS", 10, "bold"))
+            test_deadline_heading.grid(row=3, column=6, sticky=NSEW)
+            
+            for i, item in enumerate(summative_test_list):
+
+                sumtestName_button = Radiobutton(value=item["test_name"], text=str(i + 1) + ". " + item["test_name"], variable=self.getSumTestName)
+                sumtestName_button.grid(row=row_adjuster + 4, column=1, sticky=W)
+
+                sumdate_released_lbl = Label(text=item["date_released"])
+                sumdate_released_lbl.grid(row=row_adjuster + 4, column=4, sticky=NSEW)
+
+                test_deadline_lbl = Label(text=item["deadline"])
+                test_deadline_lbl.grid(row=row_adjuster + 4, column=6, sticky=NSEW)          
+
+                row_adjuster += 1
+
+        FormHeading_lbl = Label(text="Formative Test Results", font=("bold"))
+        FormHeading_lbl.grid(row=row_adjuster + 4, column=1, columnspan=6, sticky=NSEW)
+
+        row_adjuster += 4
+        formative_test_list = []
+
+        check_if_exist = os.path.isfile("formativeStudentResults.csv")
+
+        if not check_if_exist:
+            with open('formativeStudentResults.csv', 'w') as csvfile:
+
+                fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_score", "total_question", "answered_correctly"]
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+                writer.writeheader()
+
+        with open("formativeStudentResults.csv", "r") as csvfile:
+            fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_score", "total_question", "answered_correctly"]
+            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+            for row in reader:
+                if row["studentID"] == self.studentID:
+                    formative_test_list.append({"test_name": row["test_name"], "studentID": row["studentID"], "studentGroup": row["student_group"], "date_released": row["date_released"], "attempts_made": row["attempts_made"], "total_score": row["total_score"], "total_question": row["total_question"], "answered_correctly": row["answered_correctly"]})
+
+        self.getFormTestName = StringVar()
+        self.getFormTestName.set(' ')
+
+        if len(formative_test_list) == 0:
+            empty_Formtestlbl = Label(text="No Formative Tests Attempted", font=("Arial", 14, "bold"))
+            empty_Formtestlbl.grid(row=row_adjuster + 4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
+            
+        else:
+            Formtest_name_heading = Label(text="Name of Test", font=("MS", 10, "bold"))
+            Formtest_name_heading.grid(row=row_adjuster + 4, column=1, columnspan=2, sticky=NSEW)
+
+            Formdate_released_heading = Label(text="Date Released", font=("MS", 10, "bold"))
+            Formdate_released_heading.grid(row=row_adjuster + 4, column=4, sticky=NSEW)
+            
+            for i, item in enumerate(formative_test_list):
+
+                FormtestName_button = Radiobutton(value=item["test_name"], text=str(i + 1) + ". " + item["test_name"], variable=self.getFormTestName)
+                FormtestName_button.grid(row=row_adjuster + 8, column=1, sticky=W)
+
+                Formdate_released_lbl = Label(text=item["date_released"])
+                Formdate_released_lbl.grid(row=row_adjuster + 8, column=4, sticky=NSEW)
+                
+                row_adjuster += 1
+        
+        goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, StudentMenu, "Student Page", self.studentID))
+        goBack_button.grid(row=1, column=1, sticky=NSEW)
+
+        view_stats_button = Button(text="View Statistics", width=20, command=lambda:self.LoadStats())
+        view_stats_button.grid(row=1, column=6, sticky=NSEW)
+
+        SumHeading_lbl = Label(text="Summative Test Results", font=("bold"))
+        SumHeading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
+
+    def LoadStats(self):
+        if (self.getSumTestName.get() == " ") and (self.getFormTestName.get() == " "):
+            tkinter.messagebox.showinfo("View Statistics", "Please Select a Test to View!")
+        else:
+            if self.getSumTestName.get() != " ":
+                test_details = self.getSumTestName.get() + " " + "summative"
+                title = self.forename + " " + self.surname + " " + self.getSumTestName.get()
+            else:
+                test_details = self.getFormTestName.get() + " " + "formative"
+                title = self.forename + " " + self.surname + " " + self.getFormTestName.get()
+            newPage(self, ViewMyStats, title, self.studentID, test_details)
+            
+
+class ViewMyStats(Frame):
+        def __init__(self, master, *args):
+
+            Frame.__init__(self, master)
+            #self.grid()
+
+            width = 500
+            height = 500
+            centred_window = centre_app(master, width, height)        
+            master.geometry(centred_window)
+
+            master.grid_columnconfigure(0, weight=1)
+            master.grid_columnconfigure(2, weight=1)
+            master.grid_columnconfigure(5, weight=1)
+            master.grid_columnconfigure(7, weight=1)
+
+            master.grid_rowconfigure(0, weight = 1)
+            master.grid_rowconfigure(2, weight = 2)
+            #master.grid_rowconfigure(6, weight = 1)
+            master.grid_rowconfigure(14, weight=5)
+
+            #scrollBar(master, self)
+
+            self.studentID = args[0]
+            test_details = args[1].split()
+            self.test_name = test_details[0]
+            self.test_type = test_details[1]
+            
+            self.ReadStats()
+
+        def ReadStats(self):
+
+            def CalcGrade(score, question_total):
+                percentage = (score / question_total) * 100
+                if percentage >= 70:
+                    return("1st")
+                elif (percentage < 70) and (percentage >= 60):
+                    return("2-1")
+                elif (percentage < 60) and (percentage >= 50):
+                    return("2-2")
+                elif (percentage < 50) and (percentage >= 40):
+                    return("3rd")
+                else:
+                    return("Fail")
+
+            if self.test_type == "summative":
+                print("summative")
+                with open("studentResults.csv", "r") as csvfile:
+                    fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+                    reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+                    for row in reader:
+                        if (row["studentID"] == self.studentID) and (row["test_name"] == self.test_name):
+                            test_details = {"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"], "date_released": row["date_released"], "deadline": row["deadline"], "total_score": row["total_score"], "total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"]}
+
+                test_name_heading = Label(text=test_details["test_name"], font=("bold"))
+                test_name_heading.grid(row=2, column=1, columnspan=6, sticky=NSEW)
+
+                Date_released_heading = Label(text="Date Released:", font=("MS", 10, "bold"))
+                Date_released_heading.grid(row=6, column=3, sticky=NSEW)
+
+                test_deadline_heading = Label(text="Deadline:", font=("MS", 10, "bold"))
+                test_deadline_heading.grid(row=8, column=3, sticky=NSEW)
+
+                test_score_heading = Label(text="Score:", font=("MS", 10, "bold"))
+                test_score_heading.grid(row=10, column=3, sticky=NSEW)
+
+                test_grade_heading = Label(text="Grade:", font=("MS", 10, "bold"))
+                test_grade_heading.grid(row=12, column=3, sticky=NSEW)
+
+                Date_released = Label(text=test_details["date_released"])
+                Date_released.grid(row=6, column=4, sticky=NSEW)
+
+                test_deadline = Label(text=test_details["deadline"])
+                test_deadline.grid(row=8, column=4, sticky=NSEW)
+
+                test_score = Label(text=test_details["total_score"] + "/" + test_details["total_question"])
+                test_score.grid(row=10, column=4, sticky=NSEW)
+
+                score = int(test_details["total_score"])
+                question_total = int(test_details["total_question"])
+                
+                grade = CalcGrade(score, question_total)
+
+                test_grade = Label(text=grade)
+                test_grade.grid(row=12, column=4, sticky=NSEW)
+
+
+
+            else:
+                print("formative")
+                with open("formativeStudentResults.csv", "r") as csvfile:
+                    fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_score", "total_question", "answered_correctly"]
+                    reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+                    for row in reader:
+                        if (row["studentID"] == self.studentID) and (row["test_name"] == self.test_name):
+                            test_details = {"test_name": row["test_name"], "studentID": row["studentID"], "studentGroup": row["student_group"], "date_released": row["date_released"], "attempts_made": row["attempts_made"], "total_score": row["total_score"], "total_question": row["total_question"], "answered_correctly": row["answered_correctly"]}
+
+                test_name_heading = Label(text=test_details["test_name"], font=("bold"))
+                test_name_heading.grid(row=2, column=1, columnspan=6, sticky=NSEW)
+
+                Date_released_heading = Label(text="Date Released:", font=("MS", 10, "bold"))
+                Date_released_heading.grid(row=6, column=3, sticky=NSEW)
+
+                test_deadline_heading = Label(text="Number of Attempts:", font=("MS", 10, "bold"))
+                test_deadline_heading.grid(row=8, column=3, sticky=NSEW)
+
+                test_score_heading = Label(text="Score:", font=("MS", 10, "bold"))
+                test_score_heading.grid(row=10, column=3, sticky=NSEW)
+
+                Date_released = Label(text=test_details["date_released"])
+                Date_released.grid(row=6, column=4, sticky=NSEW)
+
+                test_deadline = Label(text=test_details["deadline"])
+                test_deadline.grid(row=8, column=4, sticky=NSEW)
+
+                test_score = Label(text=test_details["total_score"] + "/" + test_details["total_question"])
+                test_score.grid(row=10, column=4, sticky=NSEW)
+            goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, StudentMenu, "Student Page", self.studentID))
+            goBack_button.grid(row=1, column=3, columnspan=2, sticky=NSEW)
 
 class AttemptFormative(Frame):
 
