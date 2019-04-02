@@ -1048,119 +1048,214 @@ class ReleasedSummativeTest(Frame):
 
 
 class DisplayStudentPerformance(Frame):
-    def __init__(self, master, *args):
+	def __init__(self, master, *args):
 
-        Frame.__init__(self, master)
-        self.grid()
+		Frame.__init__(self, master)
+		self.grid()
 
-        width = 500
-        height = 500
-        centred_window = centre_app(master, width, height)
-        master.geometry(centred_window)
+		width = 500
+		height = 500
+		centred_window = centre_app(master, width, height)
+		master.geometry(centred_window)
 
-        master.grid_columnconfigure(0, weight=1)
-        master.grid_columnconfigure(2, weight=1)
-        master.grid_columnconfigure(5, weight=1)
-        master.grid_columnconfigure(7, weight=1)
+		master.grid_columnconfigure(0, weight=1)
+		master.grid_columnconfigure(2, weight=1)
+		master.grid_columnconfigure(5, weight=1)
+		master.grid_columnconfigure(7, weight=1)
 
-        master.grid_rowconfigure(0, weight = 1)
-        master.grid_rowconfigure(2, weight = 2)
-        #master.grid_rowconfigure(6, weight = 1)
-        master.grid_rowconfigure(14, weight=5)
-        self.test_name = args[1]
-        self.lecturerID = args[0]
-        self.display()
-        # self.display_completed_tests()
+		master.grid_rowconfigure(0, weight = 1)
+		master.grid_rowconfigure(2, weight = 2)
+		#master.grid_rowconfigure(6, weight = 1)
+		master.grid_rowconfigure(14, weight=5)
+		self.test_name = args[1]
+		self.lecturerID = args[0]
+		self.display()
+		# self.display_completed_tests()
 
-    def display(self):
-        studentList =[]
+	def display(self):
+		studentList =[]
+		with open('studentResults.csv', 'r') as csvfile:
+			fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+			reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+			test_name_list = self.test_name.split()
 
-        with open('studentResults.csv', 'r') as csvfile:
-            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
-            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
-            test_name_list = self.test_name.split()
+			group = test_name_list[0].translate(str.maketrans('', '', string.punctuation))
+			groupNum = test_name_list[1].translate(str.maketrans('', '', string.punctuation))
+			testNameTitle = test_name_list[2].translate(str.maketrans('', '', string.punctuation))
 
-            group = test_name_list[0].translate(str.maketrans('', '', string.punctuation))
-            groupNum = test_name_list[1].translate(str.maketrans('', '', string.punctuation))
-            testNameTitle = test_name_list[2].translate(str.maketrans('', '', string.punctuation))
+			for row in reader:
+				if group + " " + groupNum == row["studentGroup"] and testNameTitle == row["test_name"]:
+					studentList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"] })
 
-            for row in reader:
-                if group + " " + groupNum == row["studentGroup"] and testNameTitle == row["test_name"]:
-                    studentList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"] })
+		row_adjuster = 0
 
-        row_adjuster = 0
+		if len(studentList) == 0:
+			empty_testlbl = Label(text="No students have taken this test yet.", font=("Arial", 14, "bold"))
+			empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
 
+		else:
+			for i, item in enumerate(studentList):
+				released_to_lbl = Label(text=item["student_f_name"] + " " + item["student_l_name"]  + " Mark: " + item["total_score"]  + "/" + item["total_question"]  )
+				released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
 
-        if len(studentList) == 0:
-            empty_testlbl = Label(text="No students have taken this test yet.", font=("Arial", 14, "bold"))
-            empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
+				the_test = {}
+				student_answers = {}
+				score = 0
+				with open(item["test_name"] + '.csv', 'r') as csvfile:
+					fieldnames = ["question_no", "question", "answer_choices", "is_correct_answer", "answer_feedback"]
+					reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+		
+					next(reader, None)
+		
+					for row in reader:
+						the_test[row["question_no"]] = {"question":row["question"], "answer_choices": ast.literal_eval(row["answer_choices"]),
+		                                               "is_correct_answer": ast.literal_eval(row["is_correct_answer"]),
+		                                               "answer_feedback": ast.literal_eval(row["answer_feedback"])}	
+		
+				# for i in range(len(the_test)):
+				#     student_answers["Question " + str(i + 1)] = {"given_answer": {"A":next(iter_correctAnsA_entries).get(),
+				#                                                                   "B":next(iter_correctAnsB_entries).get(),
+				#                                                                   "C":next(iter_correctAnsC_entries).get(),
+				#                                                                   "D":next(iter_correctAnsD_entries).get()}}
+				# for i in range(len(self.the_test)):
+				#     if self.the_test["Question " + str(i +1)]["is_correct_answer"] == student_answers["Question " + str(i +1)]["given_answer"]:
+				#         #print("Correct Answer")
+				#         self.score += 1
+				#     #else:
+				#         #print("Wrong Answer")
+				    
+				# print("Score: %d/%d"%(self.score, len(self.the_test)))
+				student_answers["Question "] = {"given_answer": {"A":"A","B":"A","C":"A","A":"A"}}
+				test_data = [the_test, student_answers, score]
+				released_to_but = Button(text="View Student", width=15, command=lambda:newPage(self, DisplayIndividualStudentPerformance, "Individual Student Performance",  item["studentID"], test_data) )
+				released_to_but.grid(row=row_adjuster + 4, column=3, sticky=NSEW)
+				row_adjuster += 1
 
-        else:
-            for i, item in enumerate(studentList):
-                released_to_lbl = Label(text=item["student_f_name"] + " " + item["student_l_name"]  + " Mark: " + item["total_score"]  + "/" + item["total_question"]  )
-                released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
+		goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
+		goBack_button.grid(row=1, column=1, sticky=NSEW)
 
-                released_to_but = Button(text="View Student", width=15, command=lambda:newPage(self, DisplayIndividualStudentPerformance, "Individual Student Performance", self.lecturerID, item) )
-                released_to_but.grid(row=row_adjuster + 4, column=3, sticky=NSEW)
-                row_adjuster += 1
-
-        goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
-        goBack_button.grid(row=1, column=1, sticky=NSEW)
-
-        Heading_lbl = Label(text=testNameTitle, font=("bold"))
-        Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
+		Heading_lbl = Label(text=testNameTitle, font=("bold"))
+		Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
 
 
 class DisplayIndividualStudentPerformance(Frame):
-    def __init__(self, master, *args):
+	def __init__(self, master, *args):
+		Frame.__init__(self, master)
+		#self.grid()
+		width = 550
+		height = 600
+		centred_window = centre_app(master, width, height)
+		master.geometry(centred_window)
+		scrollBar(master, self)
 
-        Frame.__init__(self, master)
-        self.grid()
+		self.studentID = args[0]
+		self.the_test = args[1][0]
+		self.student_answers = args[1][1]
+		self.test_score = args[1][2]
+		self.display()
 
-        width = 500
-        height = 500
-        centred_window = centre_app(master, width, height)
-        master.geometry(centred_window)
+	# def display(self):
+	# 	row_adjuster = 0
+	# 	goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
+	# 	goBack_button.grid(row=1, column=1, sticky=NSEW)
+	# 	firstName = list(self.student_details.values())[5]
+	# 	secondName = list(self.student_details.values())[6]
+	# 	Heading_lbl = Label(text=firstName + " " + secondName, font=("bold"))
+	# 	Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
 
-        master.grid_columnconfigure(0, weight=1)
-        master.grid_columnconfigure(2, weight=1)
-        master.grid_columnconfigure(5, weight=1)
-        master.grid_columnconfigure(7, weight=1)
+	# 	testList=[]
+	# 	with open('studentResults.csv', 'r') as csvfile:
+	# 		fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+	# 		reader = csv.DictReader(csvfile, fieldnames = fieldnames)
 
-        master.grid_rowconfigure(0, weight = 1)
-        master.grid_rowconfigure(2, weight = 2)
-        #master.grid_rowconfigure(6, weight = 1)
-        master.grid_rowconfigure(14, weight=5)
-        self.student_details = args[1]
-        self.lecturerID = args[0]
-        self.display()
-
-    def display(self):
-        row_adjuster = 0
-        goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
-        goBack_button.grid(row=1, column=1, sticky=NSEW)
-        firstName = list(self.student_details.values())[5]
-        secondName = list(self.student_details.values())[6]
-        Heading_lbl = Label(text=firstName + " " + secondName, font=("bold"))
-        Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
-
-        testList=[]
-        with open('studentResults.csv', 'r') as csvfile:
-            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
-            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
-
-            for row in reader:
-                if row["student_f_name"] == firstName:
-                    testList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"] })
+	# 		for row in reader:
+	# 			if row["student_f_name"] == firstName:
+	# 				testList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"] })
 
 
-        if len(testList) == 0:
-            empty_testlbl = Label(text="This student has taken no summative tests yet.", font=("Arial", 14, "bold"))
-            empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
-        else:
-            for i, item in enumerate(testList):
-                released_to_lbl = Label(text=item["test_name"] + " "  + " Mark: " + item["total_score"]  + "/" + item["total_question"]  )
-                released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
+	# 	if len(testList) == 0:
+	# 		empty_testlbl = Label(text="This student has taken no summative tests yet.", font=("Arial", 14, "bold"))
+	# 		empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
+	# 	else:
+	# 		for i, item in enumerate(testList):
+	# 			released_to_lbl = Label(text=item["test_name"] + " "  + " Mark: " + item["total_score"]  + "/" + item["total_question"]  )
+	# 			released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
+	def frameConfigure(self, event):
+		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+	def display(self):
+		studentAns_list = []
+		tempAns_holder = []
+
+		for a, b in self.student_answers.items():
+		    for c, d in b.items():
+		        for e, f in d.items():
+		            if f == True:
+		                tempAns_holder.append(e)
+		        studentAns_list.append(((tempAns_holder)))
+		        tempAns_holder = []
+
+		iter_studentAns_list = iter(studentAns_list)
+
+		print(iter_studentAns_list)
+	
+		new_line0 = Label(self.frame, text="-" * 100)
+		new_line0.grid(row=0, column=0, columnspan=3, sticky=EW)
+        
+		testScorelbl = Label(self.frame, text="Score:  %d / %d"%(self.test_score, len(self.the_test)), font=("Arial", 14, "bold"))
+		testScorelbl.grid(row=1, column=0, rowspan=3, sticky=NW)
+		
+		goBack_button = Button(self.frame, text="Main Menu", command=lambda:newPage(self, LecturerMenu, "Lecturer Menu", self.le))
+		goBack_button.grid(row=1, column=2, sticky=W)
+
+
+		rowAdjuster = 0
+		question_no = 1
+
+
+		for item in self.the_test.values():
+
+			new_line = Label(self.frame, text="-" * 100)
+			new_line.grid(row=rowAdjuster +2, column=0, columnspan=3, sticky=EW)
+			
+			question_no_lbl = Label(self.frame, text="Question " + str(question_no) + ":", font=("Arial", 12, "bold"))
+			question_no_lbl.grid(row= rowAdjuster + 3, column=0, sticky=EW)
+			questionlbl = Label(self.frame, text=item['question'], font=("Arial", 12))
+			questionlbl.grid(row= rowAdjuster + 3, column=1, sticky=W)
+			ansA = Label(self.frame, text="A.", font=("Arial", 10, "bold"))
+			ansA.grid(row=rowAdjuster + 5, column=0, sticky=E)
+			ansA_lbl = Label(self.frame, text=item['answer_choices']['A'], font=("Arial", 10))
+			ansA_lbl.grid(row=rowAdjuster + 5, column=1, sticky=W)
+			ansB = Label(self.frame, text="B.", font=("Arial", 10, "bold"))
+			ansB.grid(row=rowAdjuster + 6, column=0, sticky=E)
+			ansB_lbl = Label(self.frame, text=item['answer_choices']['B'], font=("Arial", 10))
+			ansB_lbl.grid(row=rowAdjuster + 6, column=1, sticky=W)
+			if item['answer_choices']['C'] != "":
+			    
+			    ansC = Label(self.frame, text="C.", font=("Arial", 10, "bold"))
+			    ansC.grid(row=rowAdjuster + 7, column=0, sticky=E)
+			    ansC_lbl = Label(self.frame, text=item['answer_choices']['C'], font=("Arial", 10))
+			    ansC_lbl.grid(row=rowAdjuster + 7, column=1, sticky=W)
+			if item['answer_choices']['D'] != "":
+			    ansD = Label(self.frame, text="D.", font=("Arial", 10, "bold"))
+			    ansD.grid(row=rowAdjuster + 8, column=0, sticky=E)
+			    ansD_lbl = Label(self.frame, text=item['answer_choices']['D'], font=("Arial", 10))
+			    ansD_lbl.grid(row=rowAdjuster + 8, column=1, sticky=W)
+			new_line1 = Label(self.frame, text="-" * 100)
+			new_line1.grid(row=rowAdjuster +9, column=0, columnspan=3, sticky=EW)
+			chosenAns_lbl = Label(self.frame, text="Selected Answer:  %s"%("  ".join(next(iter_studentAns_list))), font=("Arial", 12))
+			chosenAns_lbl.grid(row= rowAdjuster + 10, column=0, columnspan=2, sticky=W)
+			#chosenAnswers = Label(self.frame, text="  ".join(next(iter_studentAns_list)), font=("Arial", 12))
+			#chosenAnswers.grid(row= rowAdjuster + 10, column=1, sticky=W)
+			if item['is_correct_answer'] == self.student_answers["Question " + str(question_no)]["given_answer"]:
+			    correctOrWrong = Label(self.frame, text="Correct Answer!", fg="green", font=("Arial", 12, "bold"))
+			    correctOrWrong.grid(row=rowAdjuster +11, column=1, sticky=SW)
+			else:
+			    correctOrWrong = Label(self.frame, text="Incorrect Answer!", fg="red", font=("Arial", 12, "bold"))
+			    correctOrWrong.grid(row=rowAdjuster +11, column=1, sticky=SW)
+			rowAdjuster += 11
+			question_no += 1
+
 
 
 
