@@ -15,6 +15,7 @@ from tkinter import ttk
 from tkcalendar import Calendar, DateEntry
 import operator
 import string
+from StudentMenu import TestWindow
 
 
 
@@ -1111,22 +1112,16 @@ class DisplayStudentPerformance(Frame):
 						the_test[row["question_no"]] = {"question":row["question"], "answer_choices": ast.literal_eval(row["answer_choices"]),
 		                                               "is_correct_answer": ast.literal_eval(row["is_correct_answer"]),
 		                                               "answer_feedback": ast.literal_eval(row["answer_feedback"])}	
-		
+	    		# iter_correctAnsA_entries = iter(self.correctAnsA_entries)
+       #  		iter_correctAnsB_entries = iter(self.correctAnsB_entries)
+       #  		iter_correctAnsC_entries = iter(self.correctAnsC_entries)
+       #  		iter_correctAnsD_entries = iter(self.correctAnsD_entries)	                                               
 				# for i in range(len(the_test)):
-				#     student_answers["Question " + str(i + 1)] = {"given_answer": {"A":next(iter_correctAnsA_entries).get(),
-				#                                                                   "B":next(iter_correctAnsB_entries).get(),
-				#                                                                   "C":next(iter_correctAnsC_entries).get(),
-				#                                                                   "D":next(iter_correctAnsD_entries).get()}}
-				# for i in range(len(self.the_test)):
-				#     if self.the_test["Question " + str(i +1)]["is_correct_answer"] == student_answers["Question " + str(i +1)]["given_answer"]:
-				#         #print("Correct Answer")
-				#         self.score += 1
-				#     #else:
-				#         #print("Wrong Answer")
-				    
+				# 	student_answers["Question " + str(i + 1)] = {"given_answer":}				    
+						print(the_test[row["question_no"]]["answer_choices"])
 				# print("Score: %d/%d"%(self.score, len(self.the_test)))
 				student_answers["Question "] = {"given_answer": {"A":"A","B":"A","C":"A","A":"A"}}
-				test_data = [the_test, student_answers, score]
+				test_data = [the_test, student_answers, int(item["total_score"])]
 				released_to_but = Button(text="View Student", width=15, command=lambda:newPage(self, DisplayIndividualStudentPerformance, "Individual Student Performance",  item["studentID"], test_data) )
 				released_to_but.grid(row=row_adjuster + 4, column=3, sticky=NSEW)
 				row_adjuster += 1
@@ -1136,6 +1131,7 @@ class DisplayStudentPerformance(Frame):
 
 		Heading_lbl = Label(text=testNameTitle, font=("bold"))
 		Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
+
 
 
 class DisplayIndividualStudentPerformance(Frame):
@@ -1154,32 +1150,6 @@ class DisplayIndividualStudentPerformance(Frame):
 		self.test_score = args[1][2]
 		self.display()
 
-	# def display(self):
-	# 	row_adjuster = 0
-	# 	goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
-	# 	goBack_button.grid(row=1, column=1, sticky=NSEW)
-	# 	firstName = list(self.student_details.values())[5]
-	# 	secondName = list(self.student_details.values())[6]
-	# 	Heading_lbl = Label(text=firstName + " " + secondName, font=("bold"))
-	# 	Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
-
-	# 	testList=[]
-	# 	with open('studentResults.csv', 'r') as csvfile:
-	# 		fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
-	# 		reader = csv.DictReader(csvfile, fieldnames = fieldnames)
-
-	# 		for row in reader:
-	# 			if row["student_f_name"] == firstName:
-	# 				testList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"] })
-
-
-	# 	if len(testList) == 0:
-	# 		empty_testlbl = Label(text="This student has taken no summative tests yet.", font=("Arial", 14, "bold"))
-	# 		empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
-	# 	else:
-	# 		for i, item in enumerate(testList):
-	# 			released_to_lbl = Label(text=item["test_name"] + " "  + " Mark: " + item["total_score"]  + "/" + item["total_question"]  )
-	# 			released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
 	def frameConfigure(self, event):
 		self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
