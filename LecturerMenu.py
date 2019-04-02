@@ -977,8 +977,38 @@ class ReleasedSummativeTest(Frame):
 		Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
 
 	def view_results(self):
+		# test_deadline = self.getTestDeadline.get()
+		# print(test_deadline)
+		summative_list =[]
+		with open("ReleasedSummative.csv", "r") as csvfile:
+					fieldnames = ["test_name", "test_deadline", "test_duration", "date_released", "released_by", "released_to"]
+					reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+		
+					for row in reader:
+						if row["released_by"] == self.lecturerID:
+							summative_list.append({"test_name": row["test_name"], "released_to": row["released_to"],
+										   "date_released": row["date_released"], "test_deadline": row["test_deadline"]})
+		today = date.today().isoformat()
+		today = today.split("-")
+		today = today[0].translate(str.maketrans('', '', string.punctuation)) + today[1].translate(str.maketrans('', '', string.punctuation)) + today[2].translate(str.maketrans('', '', string.punctuation))
+		print(today)
+		test_name = ast.literal_eval(self.getTestName.get())
+		test_name = test_name.split()
+		deadline = test_name[4].translate(str.maketrans('', '', string.punctuation))
+		deadline = deadline[4:8] + deadline[2:4] + deadline[0:2]
+		test_title = test_name[2].translate(str.maketrans('', '', string.punctuation))
 
-		test_name = self.getTestName.get()
+		for item in summative_list:
+			if item["test_name"] == test_title:
+				print(today)
+				print(deadline)
+				if today <= deadline:
+					print("error")
+					error_msg = "Test hasnt passed its deadline"
+					tkinter.messagebox.showwarning("Entry Error", error_msg)
+					return
+
+		
 
 		if test_name != ' ':
 			test_name = ast.literal_eval(self.getTestName.get())
