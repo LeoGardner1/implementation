@@ -62,6 +62,9 @@ def scrollBar(master, self):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))    
 '''
 
+def rmv_extra_spaces(words):
+    return " ".join(words.split()).strip()
+
 def test_settings(self, test_name, lecturerID, test_type):
 
     student_cohorts = []
