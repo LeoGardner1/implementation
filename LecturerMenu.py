@@ -1107,8 +1107,8 @@ class DisplayIndividualStudentPerformance(Frame):
 				released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
 
 
-
+'''
 root = Tk()
 app = LecturerMenu(root)
 root.mainloop()
-
+'''
