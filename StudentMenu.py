@@ -29,8 +29,8 @@ class StudentMenu(Frame):
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight = 1)
 
-        self.studentID = args[0]
-        #self.studentID = '100001'
+        #self.studentID = args[0]
+        self.studentID = '100001'
 
         self.mainMenu()
 
@@ -158,10 +158,17 @@ class FormativeTest(Frame):
 
     def attempt_formative(self):
 
+##        currentDate = datetime.today()
+##        if currentDate > deadline:
+##            pastDeadline = True
+##            errormsg += "The deadline for this test has passed! "
+
         test_name = self.getTestName.get()
         test_type = " formative"
         test_details = ""
         test_details = test_name + test_type
+
+        self.max_attempt = 0
 
         testTaken = False
  
@@ -171,34 +178,110 @@ class FormativeTest(Frame):
         with open("ReleasedFormative.csv", "r") as csvfile:
             fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
             reader = csv.DictReader(csvfile, fieldnames = fieldnames)
-##            for row in reader:
-##                if row["test_name"] == test_name:
-##                    deadline = datetime.strptime(row["test_deadline"], "%d/%m/%Y")
-##        currentDate = datetime.today()
-##        if currentDate > deadline:
-##            pastDeadline = True
-##            errormsg += "The deadline for this test has passed! "
+            for row in reader:
+                if row["test_name"] == test_name:
+                    self.max_attempt = row["student_maxAttempt"]
+
         with open('formativeStudentResults.csv', 'r') as results:
-            fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_scores", "total_question", "answered_correctly"]
+            fieldnames = ["test_name", "studentID", "studentGroup", "attempts_made", "max_attempt",
+                          "total_scores", "total_question", "answered_correctly", "given_answers"]
             reader = csv.DictReader(results, fieldnames)
             for row in reader:
                 if (row["studentID"] == self.studentID) and (row["test_name"] == test_name):
                     testTaken = True
-                    errormsg += "You have already taken this test! "
-            if test_name == ' ':
-                errormsg += "Please select a test to attempt!"
-                return
+                    if row['attempts_made'] < row['max_attempt']:
+                        if int(row['max_attempt']) - int(row['attempts_made']) == 1:
+                            tkinter.messagebox.showinfo("Test Submission", "This is your final attempt")
+                            newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details, row['attempts_made'])
+                        else:
+                            tkinter.messagebox.showinfo("Test Submission", "You have %d attempts remaining"%(int(row['max_attempt']) - int(row['attempts_made'])))
+                            newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details, row['attempts_made'])
+                    else:
+                        tkinter.messagebox.showinfo("Test Submission", "You dont have anymore attempts remaining")
+
+        if test_name == ' ':
+            tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
+            return
+            
         if errormsg != "":
             tkinter.messagebox.showinfo("Test Submission", errormsg)
+            
         if (testTaken == False):
-            newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details)
+            newPage(self, TestAttemptNo, "Formative Assessment Test", self.studentID, test_details, self.max_attempt)
 
-       
-##        if test_name == ' ':
-##            tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
-##            return
-##
-##        newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details)
+class TestAttemptNo(Frame):
+
+    def __init__(self, master, *args):
+
+        Frame.__init__(self, master)
+        self.grid()
+
+        width = 500
+        height = 500
+
+        centred_window = centre_app(master, width, height)
+        master.geometry(centred_window)
+
+        master.grid_columnconfigure(0, weight=1)
+        master.grid_columnconfigure(2, weight=1)
+        master.grid_columnconfigure(5, weight=1)
+        master.grid_columnconfigure(7, weight=1)
+
+        master.grid_rowconfigure(0, weight = 1)
+        master.grid_rowconfigure(2, weight = 2)
+        master.grid_rowconfigure(6, weight = 1)
+        master.grid_rowconfigure(9, weight=5)
+
+        self.studentID = args[0]
+
+        self.stu_details = args[1]
+
+        self.test_details = args[1].split()
+
+        self.test_name = self.test_details[0]
+
+        self.max_attempt = args[2]
+
+        self.attempt_no()
+
+    def attempt_no(self):
+
+        new_line = Label(text=" ")
+        new_line.grid(row=6)
+
+        attempt_no_label = Label(text="Select the maximum number you would like to atttempt this test.")
+        attempt_no_label.grid(row=4, rowspan=3, column=0, columnspan=7, sticky=NSEW)
+
+        attempt_no_list = list(range(1,int(self.max_attempt)+1))
+
+        self.attempt_no = StringVar(self.master)
+        self.attempt_no.set(attempt_no_list[-1])
+
+        attempt_no_option = OptionMenu(self.master, self.attempt_no, *attempt_no_list)
+        attempt_no_option.grid(row=7, column=4, sticky=NSEW)
+
+        goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, StudentMenu, "Student Page", self.studentID))
+        goBack_button.grid(row=1, column=1, sticky=NSEW)
+
+        cont_button = Button(text="Continue Attempting Test", width=20, command=self.write_to_csv)
+        cont_button.grid(row=1, column=6, sticky=NSEW)
+
+    def write_to_csv(self):
+
+        with open('formativeStudentResults.csv', 'a') as csvfile:
+
+            fieldnames = ["test_name", "studentID", "studentGroup", "attempts_made", "max_attempt",
+                          "total_scores", "total_question", "answered_correctly", "given_answers"]
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+            #writer.writeheader()
+
+            writer.writerow({"test_name":self.test_name, "studentID":self.studentID, "studentGroup":None, "attempts_made": 0,
+                             "max_attempt": self.attempt_no.get(), "total_scores":None, "total_question":None, "answered_correctly":None,
+                             "given_answers":None})
+
+            newPage(self, TestWindow, "Formative Assessment Test", self.studentID, self.stu_details, 0)
+
 
 class SummativeTest(Frame):
 
@@ -364,6 +447,8 @@ class TestWindow(Frame):
         self.test_name = self.test_details[0]
 
         self.test_type = self.test_details[1]
+
+        self.attempts_made = args[2]
         
         self.test_window()
 
@@ -382,9 +467,7 @@ class TestWindow(Frame):
                                                "is_correct_answer": ast.literal_eval(row["is_correct_answer"]),
                                                "answer_feedback": ast.literal_eval(row["answer_feedback"])}
 
-        print(self.the_test)
-
-
+        #print(self.the_test)
 
         new_line0 = Label(self.frame, text="-" * 100)
         new_line0.grid(row=0, column=0, columnspan=3, sticky=EW)
@@ -506,13 +589,17 @@ class TestWindow(Frame):
 
         #print(student_answers)
 
+        self.for_formative = {}
+
         for i in range(len(self.the_test)):
             if self.the_test["Question " + str(i +1)]["is_correct_answer"] == student_answers["Question " + str(i +1)]["given_answer"]:
                 #print("Correct Answer")
                 self.score += 1
-            #else:
+                self.for_formative["Q" + str(i +1)] = 1
+            else:
+                self.for_formative["Q" + str(i +1)] = 0
                 #print("Wrong Answer")
-            
+        print(self.for_formative)    
         print("Score: %d/%d"%(self.score, len(self.the_test)))
 
         self.test_data = [self.the_test, student_answers, self.score]
@@ -542,15 +629,6 @@ class TestWindow(Frame):
                     self.date_released = row["date_released"]
                     self.deadline = row["test_deadline"]
 
-    def GetFormTestDetails(self):
-        with open("ReleasedSummative.csv", "r") as tests:
-            fieldnames = ["test_name", "student_maxAttempt", "test_duration", "date_released", "released_by", "released_to"]
-            reader = csv.DictReader(tests, fieldnames=fieldnames)
-            for row in reader:
-                if row["test_name"] == self.test_name:
-                    self.date_released = row["date_released"]
-
-
     def WriteSummativeResult(self):
         self.GetStuDetails()
         self.GetSumTestDetails()
@@ -565,19 +643,46 @@ class TestWindow(Frame):
     def WriteFormativeResult(self):
 
         self.GetStuDetails()
-        self.GetFormTestDetails()
-        
-        with open('formativeStudentResults.csv', 'a') as results:
-            fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_scores", "total_question", "answered_correctly"]
-            writer = csv.DictWriter(results, fieldnames)
-            writer.writerow({"test_name": self.test_name, "studentID": self.studentID, "studentGroup": self.group, "date_released": self.date_released, "attempts_made": self.attempts_made,
-                             "total_scores": self.totalMark, "total_question": self.totalQuestions, "answered_correctly": self.answered_correctly})
-            tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
 
+        tempfile = open("formativeStudentResults.tmp", "w")
+        lectfile = "formativeStudentResults.csv"
+        
+        with open(lectfile, 'r') as csvfile, tempfile:
+            fieldnames = ["test_name", "studentID", "studentGroup", "attempts_made", "max_attempt",
+                          "total_scores", "total_question", "answered_correctly", "given_answers"]
+
+            reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+            writer = csv.DictWriter(tempfile, fieldnames=fieldnames)
+
+            for row in reader:
+                if row["studentID"] == self.studentID and row['test_name'] == self.test_name:
+
+                    row["studentGroup"] = self.group
+                    row["attempts_made"] = int(row["attempts_made"]) + 1
+                    row["total_scores"] = self.score
+                    row["total_question"] = len(self.for_formative)
+                    
+                    if row["answered_correctly"] == "":
+                        row["answered_correctly"] = self.for_formative
+                    else:
+                        ast_answers = ast.literal_eval(row["answered_correctly"])
+                        for i in range(len(ast_answers)):
+                            ast_answers["Q"+str(i+1)] += self.for_formative["Q"+str(i+1)]
+
+                        row["answered_correctly"] = ast_answers
+                   
+                row = {"test_name": row["test_name"], "studentID": row["studentID"], "studentGroup": row["studentGroup"],
+                       "attempts_made": row["attempts_made"], "max_attempt": row["max_attempt"], "total_scores": row["total_scores"],
+                       "total_question": row["total_question"], "answered_correctly": row["answered_correctly"], "given_answers": row["given_answers"]}
+                
+                writer.writerow(row)
+
+        remove('formativeStudentResults.csv')
+        rename('formativeStudentResults.tmp', 'formativeStudentResults.csv')
+
+        tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
         newPage(self, ResultsWindow, "Your Test Result", self.studentID, self.test_data)
         
-        test_file = "ReleasedFormative.csv"
-        print(self.totalMark)
         
 class ResultsWindow(Frame):
 
@@ -1005,8 +1110,8 @@ class AttemptSummative(Frame):
 
     pass
 
-'''
+
 root = Tk()
 app = StudentMenu(root)
 root.mainloop()
-'''
+

@@ -24,11 +24,11 @@ def centre_app(m, w, h):
     y = (hs/2) - (h/2)        
     return ("%dx%d+%d+%d" %(w, h , x, y))
 
-def newPage(self, PageName, title, user_id, var=None):
+def newPage(self, PageName, title, user_id, var=None, var1=None):
     self.master.destroy()
     root = Tk()
     root.title(title)
-    PageName(root, user_id, var)
+    PageName(root, user_id, var, var1)
 
 def currentDate():
     now = datetime.datetime.now()
