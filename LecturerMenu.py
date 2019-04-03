@@ -34,8 +34,8 @@ class LecturerMenu(Frame):
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight = 1)
 
-        #self.lecturerID = args[0]
-        self.lecturerID = '100000' #TEMPORARY
+        self.lecturerID = args[0]
+        #self.lecturerID = '100000' #TEMPORARY
 
         self.mainMenu()
 
@@ -829,11 +829,11 @@ class DisplayFormativeStatistics(Frame):
         
         with open('formativeStudentResults.csv', 'r') as csvfile:
         
-            fieldnames = ['test_name', 'studentID', 'studentGroup', 'date_released', 'attempts_made', 'total_score', 'total_question', 'answered_correctly']
+            fieldnames = ["test_name", "studentID", "studentGroup", "attempts_made", "max_attempt", "total_scores", "total_question", "answered_correctly", "given_answers"]
             reader = csv.DictReader(csvfile, fieldnames = fieldnames)
             for row in reader:
-                if self.group == row['studentGroup'] and self.test_name == row['test_name'] and self.date_released == row['date_released']:
-                    submissions.append({"attempts_made": row["attempts_made"], "total_score": row["total_score"], "total_question": row["total_question"], "answered_correctly": row["answered_correctly"]})
+                if self.group == row['studentGroup'] and self.test_name == row['test_name']:
+                    submissions.append({"attempts_made": row["attempts_made"], "total_scores": row["total_scores"], "total_question": row["total_question"], "answered_correctly": row["answered_correctly"]})
         
         row_adjuster = 0
         
@@ -851,19 +851,16 @@ class DisplayFormativeStatistics(Frame):
             no_correct_per_q = {}
         
             for submission in submissions:
-                sum_score += int(submission['total_score'])
+                sum_score += int(submission['total_scores'])
                 sum_attempts += int(submission['attempts_made'])
         
                 answered_correctly = submission['answered_correctly']
-                for Qnumber, correctBool in ast.literal_eval(answered_correctly).items():
-                    if correctBool:
-                        if Qnumber in no_correct_per_q:
-                            no_correct_per_q[Qnumber] += 1
-                        else:
-                            no_correct_per_q[Qnumber] = 1
+                for Qnumber, correctAnswers in ast.literal_eval(answered_correctly).items():
+                    if Qnumber in no_correct_per_q:
+                        no_correct_per_q[Qnumber] += correctAnswers / int(submission['attempts_made'])
                     else:
-                        if Qnumber not in no_correct_per_q:
-                            no_correct_per_q[Qnumber] = 0
+                        no_correct_per_q[Qnumber] = correctAnswers / int(submission['attempts_made'])
+                    
             
             question_most_correct = max(no_correct_per_q.items(), key=operator.itemgetter(1))[0]
             question_least_correct = min(no_correct_per_q.items(), key=operator.itemgetter(1))[0]
@@ -891,7 +888,7 @@ class DisplayFormativeStatistics(Frame):
             least_correct_lbl = Label(text = "Question with least correct answers:   {question}".format(question=question_least_correct), font=("Arial",10))
             least_correct_lbl.grid(row = 7, column = 1, sticky = NSEW)
             
-            percent_correct_lbl = Label(text = "Percent of students who answered each question correctly:", font=("Arial",10))
+            percent_correct_lbl = Label(text = "Percent of correct answers across all student attempts:", font=("Arial",10))
             percent_correct_lbl.grid(row = 8, column = 1, sticky = NSEW)
             row_adjuster = 9
             for question, percent in percent_correct_per_q.items():
@@ -912,7 +909,7 @@ class ReleasedSummativeTest(Frame):
         Frame.__init__(self, master)
         self.grid()
 
-        width = 500
+        width = 800
         height = 500
         centred_window = centre_app(master, width, height)
         master.geometry(centred_window)
@@ -1224,9 +1221,8 @@ class DisplayIndividualStudentPerformance(Frame):
 			question_no += 1
 
 
-
-
+'''
 root = Tk()
 app = LecturerMenu(root)
 root.mainloop()
-
+'''
