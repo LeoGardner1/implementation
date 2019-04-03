@@ -1398,7 +1398,6 @@ class AttemptSummative(Frame):
 
     pass
 
-
 root = Tk()
 app = StudentMenu(root)
 root.mainloop()
