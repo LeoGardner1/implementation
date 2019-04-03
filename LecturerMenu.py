@@ -785,16 +785,10 @@ class ReleasedFormativeTest(Frame):
         if test_name != ' ':
             test_name = ast.literal_eval(self.getTestName.get())
 
-        #testName = " ".join(test_name.split()[1:])
-
-
-        print(test_name)
-
         if test_name == ' ':
             tkinter.messagebox.showwarning("Entry Error", "Please select a test to view statistics")
             return
         else:
-            #Change Class Name and Window Title and pass testName
             newPage(self, DisplayFormativeStatistics, "Formative Test Statistics", self.lecturerID, test_name)
 
 class DisplayFormativeStatistics(Frame):
@@ -814,7 +808,6 @@ class DisplayFormativeStatistics(Frame):
 
         master.grid_rowconfigure(0, weight=1)
         master.grid_rowconfigure(2, weight=2)
-        # master.grid_rowconfigure(6, weight = 1)
         master.grid_rowconfigure(14, weight=5)
         
         self.lecturerID = args[0]
@@ -844,7 +837,6 @@ class DisplayFormativeStatistics(Frame):
             empty_testlbl = Label(text="There have been no submissions made for this test.", font=("Arial", 14, "bold"))
             empty_testlbl.grid(row=4, column=0, columnspan=6, rowspan=2, sticky=NSEW)
         else:
-            #attaining the total marks of all students, total number of attempts and number of students answering each Q correctly etc for statistics
             max_mark = int(submissions[0]['total_question'])
             sum_score = 0
             sum_attempts = 0
