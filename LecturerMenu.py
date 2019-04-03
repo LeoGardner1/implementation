@@ -1066,18 +1066,29 @@ class DisplayStudentPerformance(Frame):
 
 	def display(self):
 		studentList =[]
-		with open('studentResults.csv', 'r') as csvfile:
-			fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
-			reader = csv.DictReader(csvfile, fieldnames = fieldnames)
-			test_name_list = self.test_name.split()
+		# with open('studentResults.csv', 'r') as csvfile:
+		# 	fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name", "given_answers"]
+		# 	reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+		test_name_list = self.test_name.split()
+		group = test_name_list[0].translate(str.maketrans('', '', string.punctuation))
+		groupNum = test_name_list[1].translate(str.maketrans('', '', string.punctuation))
+		testNameTitle = test_name_list[2].translate(str.maketrans('', '', string.punctuation))
+		
+		student_answers = {}
 
-			group = test_name_list[0].translate(str.maketrans('', '', string.punctuation))
-			groupNum = test_name_list[1].translate(str.maketrans('', '', string.punctuation))
-			testNameTitle = test_name_list[2].translate(str.maketrans('', '', string.punctuation))
-
+		# 	for row in reader:
+		# 		if group + " " + groupNum == row["studentGroup"] and testNameTitle == row["test_name"]:
+		# 			studentList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"], "given_answers": row["given_answers"] })
+		with open('studentResults.csv', 'r') as results:
+			fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name", "given_answers"]
+			reader = csv.DictReader(results, fieldnames)
 			for row in reader:
-				if group + " " + groupNum == row["studentGroup"] and testNameTitle == row["test_name"]:
-					studentList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"] })
+				if group + " " + groupNum == row["studentGroup"] and row["test_name"] == testNameTitle:
+					test_score = row["total_score"]
+					student_answers = ast.literal_eval(row["given_answers"])
+					studentList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"], "given_answers": row["given_answers"] })
+
+
 
 		row_adjuster = 0
 
@@ -1091,7 +1102,6 @@ class DisplayStudentPerformance(Frame):
 				released_to_lbl.grid(row=row_adjuster + 4, column=1, sticky=NSEW)
 
 				the_test = {}
-				student_answers = {}
 				score = 0
 				with open(item["test_name"] + '.csv', 'r') as csvfile:
 					fieldnames = ["question_no", "question", "answer_choices", "is_correct_answer", "answer_feedback"]
@@ -1103,15 +1113,9 @@ class DisplayStudentPerformance(Frame):
 						the_test[row["question_no"]] = {"question":row["question"], "answer_choices": ast.literal_eval(row["answer_choices"]),
 		                                               "is_correct_answer": ast.literal_eval(row["is_correct_answer"]),
 		                                               "answer_feedback": ast.literal_eval(row["answer_feedback"])}	
-	    		# iter_correctAnsA_entries = iter(self.correctAnsA_entries)
-       #  		iter_correctAnsB_entries = iter(self.correctAnsB_entries)
-       #  		iter_correctAnsC_entries = iter(self.correctAnsC_entries)
-       #  		iter_correctAnsD_entries = iter(self.correctAnsD_entries)	                                               
-				# for i in range(len(the_test)):
-				# 	student_answers["Question " + str(i + 1)] = {"given_answer":}				    
-						print(the_test[row["question_no"]]["answer_choices"])
-				# print("Score: %d/%d"%(self.score, len(self.the_test)))
-				student_answers["Question "] = {"given_answer": {"A":"A","B":"A","C":"A","A":"A"}}
+
+
+				print(student_answers)
 				
 				test_data = [the_test, student_answers, int(item["total_score"])]
 
@@ -1150,7 +1154,8 @@ class DisplayIndividualStudentPerformance(Frame):
 	def display(self):
 		studentAns_list = []
 		tempAns_holder = []
-
+		print(self.student_answers)
+		print(type(self.student_answers))
 		for a, b in self.student_answers.items():
 		    for c, d in b.items():
 		        for e, f in d.items():

@@ -463,7 +463,7 @@ class StudentTestWindow(Frame):
         self.result_window()
 
         
-        #if currentDate > deadline:
+        #if self.currentDate > self.deadline:
 
     def get_results_data(self):
 
@@ -485,7 +485,7 @@ class StudentTestWindow(Frame):
                 reader = csv.DictReader(csvfile, fieldnames=fieldnames)
                 for row in reader:
                     if row["studentID"] == self.studentID and row['test_name'] == self.test_name:
-                        self.test_score = row["total_score"]
+                        self.test_score = row["total_scores"]
                         self.student_answers = ast.literal_eval(row["given_answers"])
 
     def get_test_data(self):
@@ -502,6 +502,8 @@ class StudentTestWindow(Frame):
                 self.the_test[row["question_no"]] = {"question":row["question"], "answer_choices": ast.literal_eval(row["answer_choices"]),
                                                "is_correct_answer": ast.literal_eval(row["is_correct_answer"]),
                                                "answer_feedback": ast.literal_eval(row["answer_feedback"])}
+
+        #print(self.the_test)
 
     def result_window(self):
 
@@ -522,7 +524,19 @@ class StudentTestWindow(Frame):
 
         iter_studentAns_list = iter(studentAns_list)
 
-        #print(iter_studentAns_list)
+        correctAns_list = []
+        tempCor_holder = []
+
+        for key, value in self.the_test.items():
+            for  k, v in value['is_correct_answer'].items():
+                if v == True:
+                    tempCor_holder.append(k)
+            correctAns_list.append((tempCor_holder))
+            tempCor_holder = []
+
+        iter_correctAns_list = iter(correctAns_list)
+                    
+        #print(correctAns_list)
 	
         new_line0 = Label(self.frame, text="-" * 100)
         new_line0.grid(row=0, column=0, columnspan=3, sticky=EW)
@@ -625,7 +639,13 @@ class StudentTestWindow(Frame):
             feedbacks_lbl = Label(self.frame, text="Feedbacks: ", font=("Arial", 12))
             feedbacks_lbl.grid(row=rowAdjuster + 11, column=0, sticky=N, rowspan=3)
 
-            rowAdjuster += 11
+            if self.test_type == "summative":
+                if self.currentDate > self.deadline:
+                    correctAns_lbl = Label(self.frame, text="Correct Answer:  %s"%("  ".join(next(iter_correctAns_list))), font=("Arial", 12, "bold"))
+                    correctAns_lbl.grid(row= rowAdjuster + 14, column=0, columnspan=2, sticky=W)
+                
+
+            rowAdjuster += 14
             question_no += 1
 
     def frameConfigure(self, event):
