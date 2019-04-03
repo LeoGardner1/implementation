@@ -191,13 +191,30 @@ class FormativeTest(Frame):
                     testTaken = True
                     if row['attempts_made'] < row['max_attempt']:
                         if int(row['max_attempt']) - int(row['attempts_made']) == 1:
-                            tkinter.messagebox.showinfo("Test Submission", "This is your final attempt")
-                            newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details, row['attempts_made'])
+                            ok_cancel = tkinter.messagebox.askokcancel("Formative Assessment Test", "This is your final attempt!\n\nDo you want to continue?")
+                            if ok_cancel:
+                                newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details, row['attempts_made'])
+                            else:
+                                return
+                            #tkinter.messagebox.showinfo("Test Submission", "This is your final attempt")
+                            #newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details, row['attempts_made'])
                         else:
-                            tkinter.messagebox.showinfo("Test Submission", "You have %d attempts remaining"%(int(row['max_attempt']) - int(row['attempts_made'])))
-                            newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details, row['attempts_made'])
+                            ok_cancel = tkinter.messagebox.askokcancel("Formative Assessment Test", "You have %d attempts remaining.\n\nDo you want to continue?"%(int(row['max_attempt']) - int(row['attempts_made'])))
+                            if ok_cancel:
+                                newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details, row['attempts_made'])
+                            else:
+                                return
+
+                            
+                            #tkinter.messagebox.showinfo("Test Submission", "You have %d attempts remaining"%(int(row['max_attempt']) - int(row['attempts_made'])))
+                            #newPage(self, TestWindow, "Formative Assessment Test", self.studentID, test_details, row['attempts_made'])
                     else:
-                        tkinter.messagebox.showinfo("Test Submission", "You dont have anymore attempts remaining")
+                        ok_cancel = tkinter.messagebox.askokcancel("Formative Assessment Test", "You dont have anymore attempts remaining.\n\nDo you want to view your final attempt result?")
+                        if ok_cancel:
+                            newPage(self, StudentTestWindow, "Your Test Result", self.studentID, test_details)
+                        else:
+                            return
+                        #tkinter.messagebox.showinfo("Test Submission", "You dont have anymore attempts remaining")
 
         if test_name == ' ':
             tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt")
@@ -424,7 +441,7 @@ class SummativeTest(Frame):
                     testTaken = True
 
         if testTaken == True:
-            view_res = tkinter.messagebox.askokcancel("View Results", "You have already taken this test!\n\nDo you wanna see your result?\n\nAnswers will be displayed after deadline")
+            view_res = tkinter.messagebox.askokcancel("View Results", "You have already taken this test!\n\nDo you want to see your result?\n\nAnswers will be displayed after deadline")
             if view_res:
                 newPage(self, StudentTestWindow, "Your Test Result", self.studentID, test_details)
             else:
@@ -651,7 +668,9 @@ class StudentTestWindow(Frame):
                 if self.currentDate > self.deadline:
                     correctAns_lbl = Label(self.frame, text="Correct Answer:  %s"%("  ".join(next(iter_correctAns_list))), font=("Arial", 12, "bold"))
                     correctAns_lbl.grid(row= rowAdjuster + 14, column=0, columnspan=2, sticky=W)
-                
+            else:
+                correctAns_lbl = Label(self.frame, text="Correct Answer:  %s"%("  ".join(next(iter_correctAns_list))), font=("Arial", 12, "bold"))
+                correctAns_lbl.grid(row= rowAdjuster + 14, column=0, columnspan=2, sticky=W)
 
             rowAdjuster += 14
             question_no += 1
@@ -682,6 +701,8 @@ class TestWindow(Frame):
         self.test_name = self.test_details[0]
 
         self.test_type = self.test_details[1]
+
+        self.test_detail = args[1]
 
         self.attempts_made = args[2]
         
@@ -882,6 +903,8 @@ class TestWindow(Frame):
     def WriteFormativeResult(self):
 
         self.GetStuDetails()
+        attempt_no = 0
+        max_attempt = 0
 
         tempfile = open("formativeStudentResults.tmp", "w")
         lectfile = "formativeStudentResults.csv"
@@ -900,6 +923,8 @@ class TestWindow(Frame):
                     row["attempts_made"] = int(row["attempts_made"]) + 1
                     row["total_scores"] = self.score
                     row["total_question"] = len(self.for_formative)
+                    attempt_no = int(row["attempts_made"])
+                    max_attempt = int(row["max_attempt"])
                     
                     if row["answered_correctly"] == "":
                         row["answered_correctly"] = self.for_formative
@@ -920,8 +945,12 @@ class TestWindow(Frame):
         remove('formativeStudentResults.csv')
         rename('formativeStudentResults.tmp', 'formativeStudentResults.csv')
 
-        tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
-        newPage(self, ResultsWindow, "Your Test Result", self.studentID, self.test_data)
+        if attempt_no == max_attempt:
+            tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
+            newPage(self, StudentTestWindow, "Your Test Result", self.studentID, self.test_detail)
+        else:
+            tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
+            newPage(self, ResultsWindow, "Your Test Result", self.studentID, self.test_data)
         
         
 class ResultsWindow(Frame):
