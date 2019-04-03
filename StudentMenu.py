@@ -400,6 +400,11 @@ class SummativeTest(Frame):
         pastDeadline = False
         errormsg = ""
 
+        if test_name == ' ':
+            tkinter.messagebox.showwarning("Entry Error", "Please select a test to attempt!") 
+            return
+        
+
         with open("ReleasedSummative.csv", "r") as csvfile:
             fieldnames = ["test_name", "test_deadline", "test_duration", "date_released", "released_by", "released_to"]
             reader = csv.DictReader(csvfile, fieldnames = fieldnames)
@@ -417,11 +422,14 @@ class SummativeTest(Frame):
             for row in reader:
                 if (row["studentID"] == self.studentID) and (row["test_name"] == test_name):
                     testTaken = True
-                    errormsg += "You have already taken this test!\n"
-                    newPage(self, StudentTestWindow, "Your Test Result", self.studentID, test_details)
-            if test_name == ' ':
-                errormsg += "Please select a test to attempt!"
+
+        if testTaken == True:
+            view_res = tkinter.messagebox.askokcancel("View Results", "You have already taken this test!\n\nDo you wanna see your result?\n\nAnswers will be displayed after deadline")
+            if view_res:
+                newPage(self, StudentTestWindow, "Your Test Result", self.studentID, test_details)
+            else:
                 return
+            
         if errormsg != "":
             tkinter.messagebox.showinfo("Test Submission", errormsg)
         if (testTaken == False) and (pastDeadline == False):
