@@ -29,8 +29,8 @@ class StudentMenu(Frame):
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight = 1)
 
-        #self.studentID = args[0]
-        self.studentID = '100001'
+        self.studentID = args[0]
+        #self.studentID = '100001'
 
         self.mainMenu()
 
@@ -1386,8 +1386,8 @@ class AttemptSummative(Frame):
 
     pass
 
-
+'''
 root = Tk()
 app = StudentMenu(root)
 root.mainloop()
-
+'''
