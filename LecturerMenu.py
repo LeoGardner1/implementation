@@ -34,8 +34,8 @@ class LecturerMenu(Frame):
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight = 1)
 
-        self.lecturerID = args[0]
-        #self.lecturerID = '100000' #TEMPORARY
+        #self.lecturerID = args[0]
+        self.lecturerID = '100000' #TEMPORARY
 
         self.mainMenu()
 
@@ -842,7 +842,7 @@ class DisplayFormativeStatistics(Frame):
         
         if len(submissions) == 0:
             empty_testlbl = Label(text="There have been no submissions made for this test.", font=("Arial", 14, "bold"))
-            empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
+            empty_testlbl.grid(row=4, column=0, columnspan=6, rowspan=2, sticky=NSEW)
         else:
             #attaining the total marks of all students, total number of attempts and number of students answering each Q correctly etc for statistics
             max_mark = int(submissions[0]['total_question'])
@@ -898,9 +898,9 @@ class DisplayFormativeStatistics(Frame):
                 row_adjuster += 1
             
             home_but = Button(text="Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
-            home_but.grid(row=1, column=1, sticky=NSEW)
-            back_to_formative_but = Button(self, text="Back to Formative Tests", width=20, command=lambda:newPage(self, ReleasedFormativeTest, "Released Formative Test", self.lecturerID))
-            back_to_formative_but.grid(row=1, column=6)
+            home_but.grid(row=0, column=1, sticky=NSEW)
+        back_to_formative_but = Button(self, text="Back to Formative Tests", width=20, command=lambda:newPage(self, ReleasedFormativeTest, "Released Formative Test", self.lecturerID))
+        back_to_formative_but.grid(row=2, column=1)
             
 class ReleasedSummativeTest(Frame):
 
@@ -1225,9 +1225,8 @@ class DisplayIndividualStudentPerformance(Frame):
             rowAdjuster += 11
             question_no += 1
 
-
-'''
+			
 root = Tk()
 app = LecturerMenu(root)
 root.mainloop()
-'''
+

@@ -1,2 +1,3 @@
-test_name,student_maxAttempt,test_duration,date_released,released_by,released_to
-FormativeTest1,5,60,01/01/2019,100000,Group 1
+test_name,student_maxAttempt,test_duration,date_released,released_by,released_to
+FormativeTest2,2,20,03/04/2019,100000,Group 1
+Formative Test 1,3,10,03/04/2019,100000,Group 1
