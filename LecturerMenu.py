@@ -1004,10 +1004,12 @@ class ReleasedSummativeTest(Frame):
         Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
 
     def view_results(self):
-        # test_deadline = self.getTestDeadline.get()
-        # print(test_deadline)
-        summative_list =[]
-        with open("ReleasedSummative.csv", "r") as csvfile:
+    	test_name = self.getTestName.get()
+    	today = date.today().isoformat()
+    	today = today.split("-")
+    	today = today[0].translate(str.maketrans('', '', string.punctuation)) + today[1].translate(str.maketrans('', '', string.punctuation)) + today[2].translate(str.maketrans('', '', string.punctuation))
+    	summative_list =[]
+    	with open("ReleasedSummative.csv", "r") as csvfile:
                     fieldnames = ["test_name", "test_deadline", "test_duration", "date_released", "released_by", "released_to"]
                     reader = csv.DictReader(csvfile, fieldnames = fieldnames)
         
@@ -1015,37 +1017,29 @@ class ReleasedSummativeTest(Frame):
                         if row["released_by"] == self.lecturerID:
                             summative_list.append({"test_name": row["test_name"], "released_to": row["released_to"],
                                            "date_released": row["date_released"], "test_deadline": row["test_deadline"]})
-        today = date.today().isoformat()
-        today = today.split("-")
-        today = today[0].translate(str.maketrans('', '', string.punctuation)) + today[1].translate(str.maketrans('', '', string.punctuation)) + today[2].translate(str.maketrans('', '', string.punctuation))
-        print(today)
-        test_name = ast.literal_eval(self.getTestName.get())
-        test_name = test_name.split()
-        deadline = test_name[4].translate(str.maketrans('', '', string.punctuation))
-        deadline = deadline[4:8] + deadline[2:4] + deadline[0:2]
-        test_title = test_name[2].translate(str.maketrans('', '', string.punctuation))
+    	
+    	if test_name != ' ':
+    		test_name = ast.literal_eval(self.getTestName.get())
+    		test_name = test_name.split()
+    		deadline = test_name[4].translate(str.maketrans('', '', string.punctuation))
+    		deadline = deadline[4:8] + deadline[2:4] + deadline[0:2]
+    		test_title = test_name[2].translate(str.maketrans('', '', string.punctuation))
+    		test_name = ast.literal_eval(self.getTestName.get())    	
+    		for item in summative_list:
+        		if item["test_name"] == test_title:
+        			print(today)
+        			print(deadline)
+        			if today <= deadline:
+        				print("error")
+        				error_msg = "Test hasnt passed its deadline"
+        				tkinter.messagebox.showwarning("Entry Error", error_msg)
+        				return
 
-        for item in summative_list:
-            if item["test_name"] == test_title:
-                print(today)
-                print(deadline)
-                if today <= deadline:
-                    print("error")
-                    error_msg = "Test hasnt passed its deadline"
-                    tkinter.messagebox.showwarning("Entry Error", error_msg)
-                    return
-
-        
-
-        if test_name != ' ':
-            test_name = ast.literal_eval(self.getTestName.get())
-
-        print(test_name)
-
-        if test_name == ' ':
-            tkinter.messagebox.showwarning("Entry Error", "Please select a test in order to view its result")
-            return
-        newPage(self, DisplayStudentPerformance,"Display Student performance", self.lecturerID, test_name)
+    	print(test_name)
+    	if test_name == ' ':
+    		tkinter.messagebox.showwarning("Entry Error", "Please select a test in order to view its result")
+    		return
+    	newPage(self, DisplayStudentPerformance,"Display Student performance", self.lecturerID, test_name)
 
 
 class DisplayStudentPerformance(Frame):
@@ -1121,8 +1115,10 @@ class DisplayStudentPerformance(Frame):
 						print(the_test[row["question_no"]]["answer_choices"])
 				# print("Score: %d/%d"%(self.score, len(self.the_test)))
 				student_answers["Question "] = {"given_answer": {"A":"A","B":"A","C":"A","A":"A"}}
+				
 				test_data = [the_test, student_answers, int(item["total_score"])]
-				released_to_but = Button(text="View Student", width=15, command=lambda:newPage(self, DisplayIndividualStudentPerformance, "Individual Student Performance",  item["studentID"], test_data) )
+
+				released_to_but = Button(text="View Student", width=15, command=lambda:newPage(self, DisplayIndividualStudentPerformance, "Individual Student Performance",  item["studentID"], test_data, self.lecturerID))
 				released_to_but.grid(row=row_adjuster + 4, column=3, sticky=NSEW)
 				row_adjuster += 1
 
@@ -1148,6 +1144,7 @@ class DisplayIndividualStudentPerformance(Frame):
 		self.the_test = args[1][0]
 		self.student_answers = args[1][1]
 		self.test_score = args[1][2]
+		self.lecturerID = args[2]
 		self.display()
 
 	def frameConfigure(self, event):
@@ -1175,7 +1172,7 @@ class DisplayIndividualStudentPerformance(Frame):
 		testScorelbl = Label(self.frame, text="Score:  %d / %d"%(self.test_score, len(self.the_test)), font=("Arial", 14, "bold"))
 		testScorelbl.grid(row=1, column=0, rowspan=3, sticky=NW)
 		
-		goBack_button = Button(self.frame, text="Main Menu", command=lambda:newPage(self, LecturerMenu, "Lecturer Menu", self.le))
+		goBack_button = Button(self.frame, text="Main Menu", command=lambda:newPage(self, LecturerMenu, "Lecturer Menu", self.lecturerID))
 		goBack_button.grid(row=1, column=2, sticky=W)
 
 
