@@ -29,8 +29,8 @@ class StudentMenu(Frame):
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight = 1)
 
-        self.studentID = args[0]
-        #self.studentID = '100001'
+        #self.studentID = args[0]
+        self.studentID = '100001'
 
         self.mainMenu()
 
@@ -1197,18 +1197,18 @@ class ViewMyResults(Frame):
         if not check_if_exist:
             with open('formativeStudentResults.csv', 'w') as csvfile:
 
-                fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_score", "total_question", "answered_correctly"]
+                fieldnames = ["test_name", "studentID", "studentGroup", "attempts_made", "max_attempt", "total_scores", "total_question", "answered_correctly", "given_answers"]
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 writer.writeheader()
 
         with open("formativeStudentResults.csv", "r") as csvfile:
-            fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_score", "total_question", "answered_correctly"]
+            fieldnames = ["test_name", "studentID", "studentGroup", "attempts_made", "max_attempt", "total_scores", "total_question", "answered_correctly", "given_answers"]
             reader = csv.DictReader(csvfile, fieldnames = fieldnames)
 
             for row in reader:
                 if row["studentID"] == self.studentID:
-                    formative_test_list.append({"test_name": row["test_name"], "studentID": row["studentID"], "studentGroup": row["student_group"], "date_released": row["date_released"], "attempts_made": row["attempts_made"], "total_score": row["total_score"], "total_question": row["total_question"], "answered_correctly": row["answered_correctly"]})
+                    formative_test_list.append({"test_name": row["test_name"], "studentID": row["studentID"], "studentGroup": row["studentGroup"], "attempts_made": row["attempts_made"], "max_attempt": row["max_attempt"],"total_scores": row["total_scores"], "total_question": row["total_question"], "answered_correctly": row["answered_correctly"], "given_answers": row["given_answers"]})
 
         self.getFormTestName = StringVar()
         self.getFormTestName.set(' ')
@@ -1221,16 +1221,16 @@ class ViewMyResults(Frame):
             Formtest_name_heading = Label(text="Name of Test", font=("MS", 10, "bold"))
             Formtest_name_heading.grid(row=row_adjuster + 4, column=1, columnspan=2, sticky=NSEW)
 
-            Formdate_released_heading = Label(text="Date Released", font=("MS", 10, "bold"))
+            Formdate_released_heading = Label(text="attempts_made", font=("MS", 10, "bold"))
             Formdate_released_heading.grid(row=row_adjuster + 4, column=4, sticky=NSEW)
             
             for i, item in enumerate(formative_test_list):
 
                 FormtestName_button = Radiobutton(value=item["test_name"], text=str(i + 1) + ". " + item["test_name"], variable=self.getFormTestName)
-                FormtestName_button.grid(row=row_adjuster + 8, column=1, sticky=W)
+                FormtestName_button.grid(row=row_adjuster + 6, column=1, sticky=W)
 
-                Formdate_released_lbl = Label(text=item["date_released"])
-                Formdate_released_lbl.grid(row=row_adjuster + 8, column=4, sticky=NSEW)
+                Formdate_released_lbl = Label(text=item["attempts_made"])
+                Formdate_released_lbl.grid(row=row_adjuster + 6, column=4, sticky=NSEW)
                 
                 row_adjuster += 1
         
@@ -1348,33 +1348,45 @@ class ViewMyStats(Frame):
             else:
                 print("formative")
                 with open("formativeStudentResults.csv", "r") as csvfile:
-                    fieldnames = ["test_name", "studentID", "studentGroup", "date_released", "attempts_made", "total_score", "total_question", "answered_correctly"]
+                    fieldnames = ["test_name", "studentID", "studentGroup", "attempts_made", "max_attempt", "total_scores", "total_question", "answered_correctly", "given_answers"]
                     reader = csv.DictReader(csvfile, fieldnames = fieldnames)
 
                     for row in reader:
                         if (row["studentID"] == self.studentID) and (row["test_name"] == self.test_name):
-                            test_details = {"test_name": row["test_name"], "studentID": row["studentID"], "studentGroup": row["student_group"], "date_released": row["date_released"], "attempts_made": row["attempts_made"], "total_score": row["total_score"], "total_question": row["total_question"], "answered_correctly": row["answered_correctly"]}
+                            test_details = {"test_name": row["test_name"], "studentID": row["studentID"], "studentGroup": row["studentGroup"], "attempts_made": row["attempts_made"], "max_attempt": row["max_attempt"],"total_scores": row["total_scores"], "total_question": row["total_question"], "answered_correctly": row["answered_correctly"], "given_answers": row["given_answers"]}
 
                 test_name_heading = Label(text=test_details["test_name"], font=("bold"))
                 test_name_heading.grid(row=2, column=1, columnspan=6, sticky=NSEW)
 
-                Date_released_heading = Label(text="Date Released:", font=("MS", 10, "bold"))
-                Date_released_heading.grid(row=6, column=3, sticky=NSEW)
+                max_attempt_heading = Label(text="Maximum Attempts:", font=("MS", 10, "bold"))
+                max_attempt_heading.grid(row=6, column=3, sticky=NSEW)
 
-                test_deadline_heading = Label(text="Number of Attempts:", font=("MS", 10, "bold"))
-                test_deadline_heading.grid(row=8, column=3, sticky=NSEW)
+                attempts_made_heading = Label(text="Number of Attempts:", font=("MS", 10, "bold"))
+                attempts_made_heading.grid(row=8, column=3, sticky=NSEW)
 
                 test_score_heading = Label(text="Score:", font=("MS", 10, "bold"))
                 test_score_heading.grid(row=10, column=3, sticky=NSEW)
 
-                Date_released = Label(text=test_details["date_released"])
-                Date_released.grid(row=6, column=4, sticky=NSEW)
+                test_grade_heading = Label(text="Grade:", font=("MS", 10, "bold"))
+                test_grade_heading.grid(row=12, column=3, sticky=NSEW)
 
-                test_deadline = Label(text=test_details["deadline"])
-                test_deadline.grid(row=8, column=4, sticky=NSEW)
+                max_attempt = Label(text=test_details["max_attempt"])
+                max_attempt.grid(row=6, column=4, sticky=NSEW)
 
-                test_score = Label(text=test_details["total_score"] + "/" + test_details["total_question"])
+                attempts_made = Label(text=test_details["attempts_made"])
+                attempts_made.grid(row=8, column=4, sticky=NSEW)
+
+                test_score = Label(text=test_details["total_scores"] + "/" + test_details["total_question"])
                 test_score.grid(row=10, column=4, sticky=NSEW)
+
+                score = int(test_details["total_scores"])
+                question_total = int(test_details["total_question"])
+
+                grade = CalcGrade(score, question_total)
+
+                test_grade = Label(text=grade)
+                test_grade.grid(row=12, column=4, sticky=NSEW)
+
             goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, StudentMenu, "Student Page", self.studentID))
             goBack_button.grid(row=1, column=3, columnspan=2, sticky=NSEW)
 
@@ -1386,8 +1398,7 @@ class AttemptSummative(Frame):
 
     pass
 
-'''
 root = Tk()
 app = StudentMenu(root)
 root.mainloop()
-'''
+
