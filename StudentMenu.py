@@ -800,13 +800,15 @@ class ResultsWindow(Frame):
             chosenAns_lbl = Label(self.frame, text="Selected Answer:  %s"%("  ".join(next(iter_studentAns_list))), font=("Arial", 12))
             chosenAns_lbl.grid(row= rowAdjuster + 10, column=0, columnspan=2, sticky=W)
 
+
+
             #chosenAnswers = Label(self.frame, text="  ".join(next(iter_studentAns_list)), font=("Arial", 12))
             #chosenAnswers.grid(row= rowAdjuster + 10, column=1, sticky=W)
             incorrect = ""
             correct = ""
 
             for i in range(0, len(choices)):
-                addstring = "Comment " + choices[i] + ": " + item['answer_feedback'][choices[i]]
+                addstring = item['answer_feedback'][choices[i]]
                 if item['is_correct_answer'][choices[i]] == False:
                     incorrect += addstring
                 else:
@@ -814,16 +816,19 @@ class ResultsWindow(Frame):
 
             if item['is_correct_answer'] == self.student_answers["Question " + str(question_no)]["given_answer"]:
                 correctOrWrong = Label(self.frame, text="Correct Answer!", fg="green", font=("Arial", 12, "bold"))
-                correctOrWrong.grid(row=rowAdjuster +11, column=1, sticky=SW)
-                answercomment = Label(self.frame, text=correct, fg="green", font=("Arial", 12, "bold"))
-                answercomment.grid(row=rowAdjuster +12, column=1, sticky=SW)
+                correctOrWrong.grid(row=rowAdjuster +10, column=1, sticky=E)
+                answercomment = Label(self.frame, text=correct, font=("Arial", 12))
+                answercomment.grid(row=rowAdjuster +11, column=1, sticky=W)
             else:
                 correctOrWrong = Label(self.frame, text="Incorrect Answer!", fg="red", font=("Arial", 12, "bold"))
-                correctOrWrong.grid(row=rowAdjuster +11, column=1, sticky=SW)
-                answercomment = Label(self.frame, text=incorrect, fg="red", font=("Arial", 12, "bold"))
-                answercomment.grid(row=rowAdjuster +12, column=1, sticky=SW)
+                correctOrWrong.grid(row=rowAdjuster +10, column=1, sticky=E)
+                answercomment = Label(self.frame, text=incorrect, font=("Arial", 12))
+                answercomment.grid(row=rowAdjuster +11, column=1, sticky=W)
 
-            rowAdjuster += 12
+            feedbacks_lbl = Label(self.frame, text="Feedbacks: ", font=("Arial", 12))
+            feedbacks_lbl.grid(row=rowAdjuster + 11, column=0, sticky=N, rowspan=3)
+
+            rowAdjuster += 11
             question_no += 1
 
     def frameConfigure(self, event):
