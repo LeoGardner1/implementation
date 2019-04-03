@@ -411,12 +411,14 @@ class SummativeTest(Frame):
             pastDeadline = True
             errormsg += "The deadline for this test has passed!\n\n"
         with open('studentResults.csv', 'r') as results:
-            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score",
+                          "total_question", "student_f_name", "student_l_name", "given_answers"]
             reader = csv.DictReader(results, fieldnames)
             for row in reader:
                 if (row["studentID"] == self.studentID) and (row["test_name"] == test_name):
                     testTaken = True
                     errormsg += "You have already taken this test!\n"
+                    newPage(self, StudentTestWindow, "Your Test Result", self.studentID, test_details)
             if test_name == ' ':
                 errormsg += "Please select a test to attempt!"
                 return
@@ -424,6 +426,211 @@ class SummativeTest(Frame):
             tkinter.messagebox.showinfo("Test Submission", errormsg)
         if (testTaken == False) and (pastDeadline == False):
             newPage(self, TestWindow, "Summative Assessment Test", self.studentID, test_details)
+
+class StudentTestWindow(Frame):
+
+    def __init__(self, master, *args):
+
+        Frame.__init__(self, master)
+        #self.grid()
+
+        width = 550
+        height = 600
+
+        centred_window = centre_app(master, width, height)
+        master.geometry(centred_window)
+
+        scrollBar(master, self)
+
+        self.studentID = args[0]
+
+        self.test_details = args[1].split()
+
+        self.test_name = self.test_details[0]
+
+        self.test_type = self.test_details[1]
+
+        self.attempts_made = None
+
+        self.deadline = None
+
+        self.currentDate = datetime.today()
+
+        self.test_score = None
+
+        self.student_answers = None
+        
+        self.result_window()
+
+        
+        #if currentDate > deadline:
+
+    def get_results_data(self):
+
+        if self.test_type == "summative":
+            with open('studentResults.csv', 'r') as results:
+                fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score",
+                              "total_question", "student_f_name", "student_l_name", "given_answers"]
+                reader = csv.DictReader(results, fieldnames)
+                for row in reader:
+                    if row["studentID"] == self.studentID and row["test_name"] == self.test_name:
+                        self.test_score = row["total_score"]
+                        self.student_answers = ast.literal_eval(row["given_answers"])
+                        self.deadline = datetime.strptime(row["deadline"], "%d/%m/%Y")
+                        
+        else:
+            with open('formativeStudentResults.csv', 'r') as csvfile:
+                fieldnames = ["test_name", "studentID", "studentGroup", "attempts_made", "max_attempt",
+                              "total_scores", "total_question", "answered_correctly", "given_answers"]
+                reader = csv.DictReader(csvfile, fieldnames=fieldnames)
+                for row in reader:
+                    if row["studentID"] == self.studentID and row['test_name'] == self.test_name:
+                        self.test_score = row["total_score"]
+                        self.student_answers = ast.literal_eval(row["given_answers"])
+
+    def get_test_data(self):
+
+        self.the_test = {}
+
+        with open( self.test_name + '.csv', 'r') as csvfile:
+            fieldnames = ["question_no", "question", "answer_choices", "is_correct_answer", "answer_feedback"]
+            reader = csv.DictReader(csvfile, fieldnames = fieldnames)
+
+            next(reader, None)
+
+            for row in reader:
+                self.the_test[row["question_no"]] = {"question":row["question"], "answer_choices": ast.literal_eval(row["answer_choices"]),
+                                               "is_correct_answer": ast.literal_eval(row["is_correct_answer"]),
+                                               "answer_feedback": ast.literal_eval(row["answer_feedback"])}
+
+    def result_window(self):
+
+        self.get_test_data()
+        self.get_results_data()
+
+        studentAns_list = []
+        tempAns_holder = []
+
+        for a, b in self.student_answers.items():
+            
+            for c, d in b.items():
+                for e, f in d.items():
+                    if f == True:
+                        tempAns_holder.append(e)
+                studentAns_list.append(((tempAns_holder)))
+                tempAns_holder = []
+
+        iter_studentAns_list = iter(studentAns_list)
+
+        #print(iter_studentAns_list)
+	
+        new_line0 = Label(self.frame, text="-" * 100)
+        new_line0.grid(row=0, column=0, columnspan=3, sticky=EW)
+        
+        testScorelbl = Label(self.frame, text="Score:  %s / %d"%(self.test_score, len(self.the_test)), font=("Arial", 14, "bold"))
+        testScorelbl.grid(row=1, column=0, rowspan=3, sticky=NW)
+
+        #testNamelbl.grid(row=1, column=0, rowspan=3, columnspan=2, sticky=NW)
+
+        #testScore = Label(self.frame, text="Score: ", font=("Arial", 14, "bold"))
+        #testScore.grid(row=1, column=1, rowspan=3, sticky=EW)
+
+        #submitBtn = Button(self.frame, text="Submit Test", command=self.check_test)
+        #submitBtn.grid(row=1, column=2, sticky=E)
+
+        goBack_button = Button(self.frame, text="Main Menu", command=lambda:newPage(self, StudentMenu, "Student Page", self.studentID))
+        goBack_button.grid(row=1, column=2, sticky=W)
+
+        rowAdjuster = 0
+        question_no = 1
+
+
+        for item in self.the_test.values():
+
+            choices = ["A", "B"]
+
+            new_line = Label(self.frame, text="-" * 100)
+            new_line.grid(row=rowAdjuster +2, column=0, columnspan=3, sticky=EW)
+            
+            question_no_lbl = Label(self.frame, text="Question " + str(question_no) + ":", font=("Arial", 12, "bold"))
+            question_no_lbl.grid(row= rowAdjuster + 3, column=0, sticky=EW)
+
+            questionlbl = Label(self.frame, text=item['question'], font=("Arial", 12))
+            questionlbl.grid(row= rowAdjuster + 3, column=1, sticky=W)
+
+
+            ansA = Label(self.frame, text="A.", font=("Arial", 10, "bold"))
+            ansA.grid(row=rowAdjuster + 5, column=0, sticky=E)
+
+            ansA_lbl = Label(self.frame, text=item['answer_choices']['A'], font=("Arial", 10))
+            ansA_lbl.grid(row=rowAdjuster + 5, column=1, sticky=W)
+
+            ansB = Label(self.frame, text="B.", font=("Arial", 10, "bold"))
+            ansB.grid(row=rowAdjuster + 6, column=0, sticky=E)
+
+            ansB_lbl = Label(self.frame, text=item['answer_choices']['B'], font=("Arial", 10))
+            ansB_lbl.grid(row=rowAdjuster + 6, column=1, sticky=W)
+
+            if item['answer_choices']['C'] != "":
+                
+                ansC = Label(self.frame, text="C.", font=("Arial", 10, "bold"))
+                ansC.grid(row=rowAdjuster + 7, column=0, sticky=E)
+
+                ansC_lbl = Label(self.frame, text=item['answer_choices']['C'], font=("Arial", 10))
+                ansC_lbl.grid(row=rowAdjuster + 7, column=1, sticky=W)
+
+                choices.append("C")
+
+            if item['answer_choices']['D'] != "":
+
+                ansD = Label(self.frame, text="D.", font=("Arial", 10, "bold"))
+                ansD.grid(row=rowAdjuster + 8, column=0, sticky=E)
+
+                ansD_lbl = Label(self.frame, text=item['answer_choices']['D'], font=("Arial", 10))
+                ansD_lbl.grid(row=rowAdjuster + 8, column=1, sticky=W)
+
+                choices.append("D")
+
+            new_line1 = Label(self.frame, text="-" * 100)
+            new_line1.grid(row=rowAdjuster +9, column=0, columnspan=3, sticky=EW)
+
+            chosenAns_lbl = Label(self.frame, text="Selected Answer:  %s"%("  ".join(next(iter_studentAns_list))), font=("Arial", 12))
+            chosenAns_lbl.grid(row= rowAdjuster + 10, column=0, columnspan=2, sticky=W)
+
+
+
+            #chosenAnswers = Label(self.frame, text="  ".join(next(iter_studentAns_list)), font=("Arial", 12))
+            #chosenAnswers.grid(row= rowAdjuster + 10, column=1, sticky=W)
+            incorrect = ""
+            correct = ""
+
+            for i in range(0, len(choices)):
+                addstring = item['answer_feedback'][choices[i]]
+                if item['is_correct_answer'][choices[i]] == False:
+                    incorrect += addstring
+                else:
+                    correct += addstring
+
+            if item['is_correct_answer'] == self.student_answers["Question " + str(question_no)]["given_answer"]:
+                correctOrWrong = Label(self.frame, text="Correct Answer!", fg="green", font=("Arial", 12, "bold"))
+                correctOrWrong.grid(row=rowAdjuster +10, column=1, sticky=E)
+                answercomment = Label(self.frame, text=correct, font=("Arial", 12))
+                answercomment.grid(row=rowAdjuster +11, column=1, sticky=W)
+            else:
+                correctOrWrong = Label(self.frame, text="Incorrect Answer!", fg="red", font=("Arial", 12, "bold"))
+                correctOrWrong.grid(row=rowAdjuster +10, column=1, sticky=E)
+                answercomment = Label(self.frame, text=incorrect, font=("Arial", 12))
+                answercomment.grid(row=rowAdjuster +11, column=1, sticky=W)
+
+            feedbacks_lbl = Label(self.frame, text="Feedbacks: ", font=("Arial", 12))
+            feedbacks_lbl.grid(row=rowAdjuster + 11, column=0, sticky=N, rowspan=3)
+
+            rowAdjuster += 11
+            question_no += 1
+
+    def frameConfigure(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
 
 class TestWindow(Frame):
 
@@ -561,11 +768,11 @@ class TestWindow(Frame):
         iter_correctAnsC_entries = iter(self.correctAnsC_entries)
         iter_correctAnsD_entries = iter(self.correctAnsD_entries)
 
-        student_answers = {}
+        self.student_answers = {}
         self.score = 0
 
         for i in range(len(self.the_test)):
-            student_answers["Question " + str(i + 1)] = {"given_answer": {"A":next(iter_correctAnsA_entries).get(),
+            self.student_answers["Question " + str(i + 1)] = {"given_answer": {"A":next(iter_correctAnsA_entries).get(),
                                                                           "B":next(iter_correctAnsB_entries).get(),
                                                                           "C":next(iter_correctAnsC_entries).get(),
                                                                           "D":next(iter_correctAnsD_entries).get()}}
@@ -573,7 +780,7 @@ class TestWindow(Frame):
         studentAns_list = []
         tempAns_holder = []
 
-        for a, b in student_answers.items():
+        for a, b in self.student_answers.items():
             
             for c, d in b.items():
                 for e, f in d.items():
@@ -592,7 +799,7 @@ class TestWindow(Frame):
         self.for_formative = {}
 
         for i in range(len(self.the_test)):
-            if self.the_test["Question " + str(i +1)]["is_correct_answer"] == student_answers["Question " + str(i +1)]["given_answer"]:
+            if self.the_test["Question " + str(i +1)]["is_correct_answer"] == self.student_answers["Question " + str(i +1)]["given_answer"]:
                 #print("Correct Answer")
                 self.score += 1
                 self.for_formative["Q" + str(i +1)] = 1
@@ -602,7 +809,7 @@ class TestWindow(Frame):
         print(self.for_formative)    
         print("Score: %d/%d"%(self.score, len(self.the_test)))
 
-        self.test_data = [self.the_test, student_answers, self.score]
+        self.test_data = [self.the_test, self.student_answers, self.score]
 
         if self.test_type == "summative":
             self.WriteSummativeResult()
@@ -634,9 +841,13 @@ class TestWindow(Frame):
         self.GetSumTestDetails()
         
         with open('studentResults.csv', 'a') as results:
-            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score",
+                          "total_question", "student_f_name", "student_l_name", "given_answers"]
             writer = csv.DictWriter(results, fieldnames)
-            writer.writerow({"studentID": self.studentID, "studentGroup": self.group, "test_name": self.test_name, "date_released": self.date_released, "deadline": self.deadline, "total_score": self.score, "total_question": len(self.the_test), "student_f_name": self.forename, "student_l_name": self.surname})
+            writer.writerow({"studentID": self.studentID, "studentGroup": self.group, "test_name": self.test_name,
+                             "date_released": self.date_released, "deadline": self.deadline, "total_score": self.score,
+                             "total_question": len(self.the_test), "student_f_name": self.forename,
+                             "student_l_name": self.surname, "given_answers": self.student_answers})
             tkinter.messagebox.showinfo("Test Submission" , "The test was submitted successfully!")
         newPage(self, ResultsWindow, "Your Test Result", self.studentID, self.test_data)
 
@@ -670,6 +881,7 @@ class TestWindow(Frame):
                             ast_answers["Q"+str(i+1)] += self.for_formative["Q"+str(i+1)]
 
                         row["answered_correctly"] = ast_answers
+                    row["given_answers"] = self.student_answers
                    
                 row = {"test_name": row["test_name"], "studentID": row["studentID"], "studentGroup": row["studentGroup"],
                        "attempts_made": row["attempts_made"], "max_attempt": row["max_attempt"], "total_scores": row["total_scores"],
@@ -869,13 +1081,15 @@ class ViewMyResults(Frame):
         if not check_if_exist:
             with open('studentResults.csv', 'w') as csvfile:
 
-                fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+                fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline",
+                              "total_score", "total_question", "student_f_name", "student_l_name", "given_answer"]
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
                 writer.writeheader()
 
         with open("studentResults.csv", "r") as csvfile:
-            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name"]
+            fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score",
+                          "total_question", "student_f_name", "student_l_name", "given_answers"]
             reader = csv.DictReader(csvfile, fieldnames = fieldnames)
 
             for row in reader:
