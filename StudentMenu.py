@@ -164,9 +164,9 @@ class FormativeTest(Frame):
 ##            errormsg += "The deadline for this test has passed! "
 
         test_name = self.getTestName.get()
-        test_type = " formative"
-        test_details = ""
-        test_details = test_name + test_type
+        test_type = "formative"
+        #test_details = ""
+        test_details = [test_name, test_type]
 
         self.max_attempt = 0
 
@@ -253,9 +253,11 @@ class TestAttemptNo(Frame):
 
         self.stu_details = args[1]
 
-        self.test_details = args[1].split()
+        self.test_details = args[1]
 
-        self.test_name = self.test_details[0]
+        #self.test_name = self.test_details[0]
+
+        self.test_name = args[1][0]
 
         self.max_attempt = args[2]
 
@@ -407,9 +409,9 @@ class SummativeTest(Frame):
     def attempt_summative(self):
 
         test_name = self.getTestName.get()
-        test_type = " summative"
-        test_details = ""
-        test_details = test_name + test_type
+        test_type = "summative"
+        #test_details = ""
+        test_details = [test_name, test_type]
 
         #print(test_details)
 
@@ -469,11 +471,11 @@ class StudentTestWindow(Frame):
 
         self.studentID = args[0]
 
-        self.test_details = args[1].split()
+        self.test_details = args[1]
 
-        self.test_name = self.test_details[0]
+        self.test_name = args[1][0]
 
-        self.test_type = self.test_details[1]
+        self.test_type = args[1][1]
 
         self.attempts_made = None
 
@@ -696,11 +698,11 @@ class TestWindow(Frame):
 
         self.studentID = args[0]
 
-        self.test_details = args[1].split()
+        #self.test_details = args[1].split()
 
-        self.test_name = self.test_details[0]
+        self.test_name = args[1][0]
 
-        self.test_type = self.test_details[1]
+        self.test_type = args[1][1]
 
         self.test_detail = args[1]
 
