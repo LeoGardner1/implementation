@@ -116,7 +116,6 @@ class CreateTest(QuestionsSet):
     def __init__(self, master, *args):
 
         Frame.__init__(self, master)
-        #self.grid()
 
         width = 550
         height = 600
@@ -202,9 +201,6 @@ class CreateTest(QuestionsSet):
             ansFieldB = Entry(self.frame)
             ansFieldB.grid(row=rowAdjuster + 7, column=1, ipadx="100", sticky=W)
 
-
-            #print(self.correctAns.get())
-            #print(ansA.cget("text"))
             ansBcommentlbl = Label(self.frame, text="Answer Comments:")
             ansBcommentlbl.grid(row=rowAdjuster + 8, column=0, rowspan=2, sticky=NE)
 
@@ -336,7 +332,6 @@ class CreateTest(QuestionsSet):
                     writer.writerow({'question_no': key, 'question':value[key], 'answer_choices':value["answer_choices"],
                                     'is_correct_answer':value['is_correct_answer'], 'answer_feedback':value['answer_feedback']})
 
-
                 tkinter.messagebox.showinfo("Test Created Successfully","Test " + self.test_name + " has been successfully created and can now be found under \"My Saved Test\"")
 
                 newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID)
@@ -349,7 +344,6 @@ class CreateTest(QuestionsSet):
             tkinter.messagebox.showwarning("Entry Error", "Please enter a test name")
             return False
 
-        #tempfile = NamedTemporaryFile(mode="w", delete=False)
         tempfile = open("lecturers.tmp", "w")
 
         lectfile = "lecturers.csv"
@@ -373,9 +367,6 @@ class CreateTest(QuestionsSet):
                 row = {"lecturerID": row["lecturerID"], "saved_test":row["saved_test"], "student_cohort":row["student_cohort"]}
 
                 writer.writerow(row)
-
-        #shutil.move(tempfile.name, lectfile)
-
 
         remove('lecturers.csv')
         rename('lecturers.tmp', 'lecturers.csv')
@@ -410,8 +401,6 @@ class SavedTest(Frame):
 
     def test_list(self):
 
-        #lecturerID = "100000"
-
         test_names = []
 
         with open("lecturers.csv", "r") as csvfile:
@@ -433,15 +422,8 @@ class SavedTest(Frame):
 
         else:
             for i, item in enumerate(test_names):
-                #testNamelbl = Label(text= str(i + 1) + ". " + item)
-                #testNamelbl.grid(row= row_adjuster + 3, column=2, columnspan=3, sticky=W)
-
-                #testName_button = Radiobutton(value=item, variable=self.getTestName)
-                #testName_button.grid(row=row_adjuster + 3, column=1, sticky=E)
-
                 testName_button = Radiobutton(value=item, text=str(i + 1) + ". " + item, variable=self.getTestName)
                 testName_button.grid(row=row_adjuster + 3, column=1, columnspan=4, sticky=W)
-
 
                 row_adjuster += 1
 
@@ -471,7 +453,6 @@ class SavedTest(Frame):
             tkinter.messagebox.showwarning("Entry Error", "Please choose a test to release")
         else:
             newPage(self, ReleaseSummative, "Summative Test Settings", self.lecturerID, self.getTestName.get())
-
 
     def frameConfigure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
@@ -616,14 +597,6 @@ class ReleaseSummative(Frame):
 
         self.date_picker = DateEntry(self.master, width=12, borderwidth=1, year=2019, firstweekday="sunday", showweeknumbers=False)
         self.date_picker.grid(row=5, column=4, sticky=NSEW)
-
-        #test_deadline_list = ["Unlimited"] + list(map(str, range(1,11)))
-
-        #self.test_deadlineDate = StringVar(self.master)
-        #self.test_deadlineDate.set(max_attempt_list[0])
-
-        #test_deadlineDate_option = OptionMenu(self.master, self.test_deadlineDate, *test_deadline_list)
-        #test_deadlineDate_option.grid(row=5, column=4, sticky=NSEW)
 
     def release_test(self):
 
@@ -835,8 +808,6 @@ class DisplayFormativeStatistics(Frame):
 
         back_to_formative_but = Button(self, text="Back to Formative Tests", width=20, command=lambda:newPage(self, ReleasedFormativeTest, "Released Formative Test", self.lecturerID))
         back_to_formative_but.grid(row=1, column=3, sticky=EW)
-        #home_but = Button(text="Back to Homepage", width=20, command=lambda:newPage(self, LecturerMenu, "Lecturer Page", self.lecturerID))
-        #home_but.grid(row=1, column=6, sticky=NSEW)
         
         if len(submissions) == 0:
             empty_testlbl = Label(text="There have been no submissions made for this test.", font=("Arial", 14, "bold"))
@@ -1034,15 +1005,11 @@ class ReleasedSummativeTest(Frame):
             test_name = ast.literal_eval(self.getTestName.get())        
             for item in summative_list:
                 if item["test_name"] == test_title:
-                    print(today)
-                    print(deadline)
                     if today <= deadline:
-                        print("error")
                         error_msg = "Test hasnt passed its deadline"
                         tkinter.messagebox.showwarning("Entry Error", error_msg)
                         return
 
-        print(test_name)
         if test_name == ' ':
             tkinter.messagebox.showwarning("Entry Error", "Please select a test in order to view its result")
             return
@@ -1072,13 +1039,9 @@ class DisplayStudentPerformance(Frame):
         self.test_name = args[1]
         self.lecturerID = args[0]
         self.display()
-        # self.display_completed_tests()
 
     def display(self):
         studentList =[]
-        # with open('studentResults.csv', 'r') as csvfile:
-        #   fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name", "given_answers"]
-        #   reader = csv.DictReader(csvfile, fieldnames = fieldnames)
         test_name_list = self.test_name.split()
         group = test_name_list[0].translate(str.maketrans('', '', string.punctuation))
         groupNum = test_name_list[1].translate(str.maketrans('', '', string.punctuation))
@@ -1086,9 +1049,6 @@ class DisplayStudentPerformance(Frame):
         
         student_answers = {}
 
-        #   for row in reader:
-        #       if group + " " + groupNum == row["studentGroup"] and testNameTitle == row["test_name"]:
-        #           studentList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"], "given_answers": row["given_answers"] })
         with open('studentResults.csv', 'r') as results:
             fieldnames = ["studentID", "studentGroup", "test_name", "date_released", "deadline", "total_score", "total_question", "student_f_name", "student_l_name", "given_answers"]
             reader = csv.DictReader(results, fieldnames)
@@ -1097,8 +1057,6 @@ class DisplayStudentPerformance(Frame):
                     test_score = row["total_score"]
                     student_answers = ast.literal_eval(row["given_answers"])
                     studentList.append({"studentID": row["studentID"], "studentGroup": row["studentGroup"], "test_name": row["test_name"],"total_score": row["total_score"],"total_question": row["total_question"], "student_f_name": row["student_f_name"], "student_l_name": row["student_l_name"], "given_answers": row["given_answers"] })
-
-
 
         row_adjuster = 0
 
@@ -1122,10 +1080,7 @@ class DisplayStudentPerformance(Frame):
                     for row in reader:
                         the_test[row["question_no"]] = {"question":row["question"], "answer_choices": ast.literal_eval(row["answer_choices"]),
                                                        "is_correct_answer": ast.literal_eval(row["is_correct_answer"]),
-                                                       "answer_feedback": ast.literal_eval(row["answer_feedback"])} 
-
-
-                print(student_answers)
+                                                       "answer_feedback": ast.literal_eval(row["answer_feedback"])}
                 
                 test_data = [the_test, student_answers, int(item["total_score"])]
 
@@ -1138,8 +1093,6 @@ class DisplayStudentPerformance(Frame):
 
         Heading_lbl = Label(text=testNameTitle, font=("bold"))
         Heading_lbl.grid(row=2, column=1, columnspan=6, sticky=NSEW)
-
-
 
 class DisplayIndividualStudentPerformance(Frame):
     def __init__(self, master, *args):
@@ -1164,8 +1117,7 @@ class DisplayIndividualStudentPerformance(Frame):
     def display(self):
         studentAns_list = []
         tempAns_holder = []
-        print(self.student_answers)
-        print(type(self.student_answers))
+
         for a, b in self.student_answers.items():
             for c, d in b.items():
                 for e, f in d.items():
@@ -1175,8 +1127,6 @@ class DisplayIndividualStudentPerformance(Frame):
                 tempAns_holder = []
 
         iter_studentAns_list = iter(studentAns_list)
-
-        print(iter_studentAns_list)
     
         new_line0 = Label(self.frame, text="-" * 100)
         new_line0.grid(row=0, column=0, columnspan=3, sticky=EW)
@@ -1187,10 +1137,8 @@ class DisplayIndividualStudentPerformance(Frame):
         goBack_button = Button(self.frame, text="Main Menu", command=lambda:newPage(self, LecturerMenu, "Lecturer Menu", self.lecturerID))
         goBack_button.grid(row=1, column=2, sticky=W)
 
-
         rowAdjuster = 0
         question_no = 1
-
 
         for item in self.the_test.values():
 
@@ -1224,14 +1172,14 @@ class DisplayIndividualStudentPerformance(Frame):
             new_line1.grid(row=rowAdjuster +9, column=0, columnspan=3, sticky=EW)
             chosenAns_lbl = Label(self.frame, text="Selected Answer:  %s"%("  ".join(next(iter_studentAns_list))), font=("Arial", 12))
             chosenAns_lbl.grid(row= rowAdjuster + 10, column=0, columnspan=2, sticky=W)
-            #chosenAnswers = Label(self.frame, text="  ".join(next(iter_studentAns_list)), font=("Arial", 12))
-            #chosenAnswers.grid(row= rowAdjuster + 10, column=1, sticky=W)
+
             if item['is_correct_answer'] == self.student_answers["Question " + str(question_no)]["given_answer"]:
                 correctOrWrong = Label(self.frame, text="Correct Answer!", fg="green", font=("Arial", 12, "bold"))
-                correctOrWrong.grid(row=rowAdjuster +11, column=1, sticky=SW)
+                correctOrWrong.grid(row=rowAdjuster +10, column=1, sticky=E)
             else:
                 correctOrWrong = Label(self.frame, text="Incorrect Answer!", fg="red", font=("Arial", 12, "bold"))
-                correctOrWrong.grid(row=rowAdjuster +11, column=1, sticky=SW)
+                correctOrWrong.grid(row=rowAdjuster +10, column=1, sticky=E)
+
             rowAdjuster += 11
             question_no += 1
 
