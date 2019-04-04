@@ -1,4 +1,0 @@
-question_no,question,answer_choices,is_correct_answer,answer_feedback
-Question 1,Test Q1,"{'A': 'sggfds', 'B': 'gsgfds', 'C': 'sgfdsg', 'D': 'sdgfdsg'}","{'A': True, 'B': False, 'C': False, 'D': False}","{'A': '\n', 'B': '\n', 'C': '\n', 'D': '\n'}"
-Question 2,Test Q2,"{'A': 'hgdhgf', 'B': 'gdh', 'C': 'gfdgfd', 'D': 'jgfdh'}","{'A': False, 'B': False, 'C': True, 'D': False}","{'A': '\n', 'B': '\n', 'C': '\n', 'D': '\n'}"
-Question 3,Test Q3,"{'A': 'fdsgds', 'B': 'fsdfsdf', 'C': 'dsfsdf', 'D': 'dsfds'}","{'A': False, 'B': True, 'C': False, 'D': False}","{'A': '\n', 'B': '\n', 'C': '\n', 'D': '\n'}"
