@@ -496,7 +496,7 @@ class ReleaseFormative(Frame):
         max_attempt_lbl = Label(text="Maximum number of attempts\nallowed to students to take this test:")
         max_attempt_lbl.grid(row=3, rowspan=2, column=1, columnspan=6, sticky=NSEW)
 
-        max_attempt_list = ["Unlimited"] + list(map(str, range(1,11)))
+        max_attempt_list = list(range(1,11))
 
         self.max_attemptNumber = StringVar(self.master)
         self.max_attemptNumber.set(max_attempt_list[0])
