@@ -98,4 +98,3 @@ root = Tk()
 app = LoginPage(root)
 root.mainloop()        
 
-#print(user_list)

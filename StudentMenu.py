@@ -29,8 +29,7 @@ class StudentMenu(Frame):
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight = 1)
 
-        #self.studentID = args[0]
-        self.studentID = '100001'
+        self.studentID = args[0]
 
         self.mainMenu()
 
@@ -1333,16 +1332,3 @@ class ViewMyStats(Frame):
 
             goBack_button = Button(text="Go Back to Homepage", width=20, command=lambda:newPage(self, StudentMenu, "Student Page", self.studentID))
             goBack_button.grid(row=1, column=3, columnspan=2, sticky=NSEW)
-
-class AttemptFormative(Frame):
-
-    pass
-
-class AttemptSummative(Frame):
-
-    pass
-
-root = Tk()
-app = StudentMenu(root)
-root.mainloop()
-

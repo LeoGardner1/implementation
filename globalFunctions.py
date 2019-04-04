@@ -4,18 +4,6 @@ import datetime
 import csv
 import ast
 
-#from StudentMenu import StudentMenu
-'''
-def lecturerHomePage():
-    lecturer = Tk()
-    lecturer.title("Lecturer Page")
-    LecturerMenu(lecturer)
-
-def studentHomePage():
-    student = Tk()
-    student.title("Student Page")
-    StudentMenu(student)
-'''
 def centre_app(m, w, h):
 
     ws = m.winfo_screenwidth()
@@ -55,12 +43,6 @@ def scrollBar(master, self):
         self.canvas.bind_all('<MouseWheel>', lambda event: self.canvas.yview_scroll(int(-1*(event.delta/50)), "units"))
 
         # end referenced code
-
-    #Add frameConfigure function into your class
-'''
-    def frameConfigure(self, event):
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))    
-'''
 
 def rmv_extra_spaces(words):
     return " ".join(words.split()).strip()

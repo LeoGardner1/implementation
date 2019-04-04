@@ -34,8 +34,7 @@ class LecturerMenu(Frame):
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight = 1)
 
-        #self.lecturerID = args[0]
-        self.lecturerID = '100000' #TEMPORARY
+        self.lecturerID = args[0]
 
         self.mainMenu()
 
@@ -1182,9 +1181,4 @@ class DisplayIndividualStudentPerformance(Frame):
 
             rowAdjuster += 11
             question_no += 1
-
-			
-root = Tk()
-app = LecturerMenu(root)
-root.mainloop()
 
