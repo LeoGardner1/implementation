@@ -34,8 +34,8 @@ class LecturerMenu(Frame):
         master.grid_columnconfigure(0, weight=1)
         master.grid_rowconfigure(0, weight = 1)
 
-        self.lecturerID = args[0]
-        #self.lecturerID = '100000' #TEMPORARY
+        #self.lecturerID = args[0]
+        self.lecturerID = '100000' #TEMPORARY
 
         self.mainMenu()
 
@@ -802,7 +802,7 @@ class DisplayFormativeStatistics(Frame):
         master.geometry(centred_window)
 
         master.grid_columnconfigure(0, weight=1)
-        master.grid_columnconfigure(2, weight=1)
+        #master.grid_columnconfigure(2, weight=1)
         master.grid_columnconfigure(5, weight=1)
         master.grid_columnconfigure(7, weight=1)
 
@@ -831,7 +831,7 @@ class DisplayFormativeStatistics(Frame):
         row_adjuster = 0
         
         test_name_title_lbl = Label(text=self.test_name, font=("Arial", 14, "bold"))
-        test_name_title_lbl.grid(row = 2, column = 0, columnspan=7, sticky = NSEW)
+        test_name_title_lbl.grid(row = 2, column = 0, columnspan=8, sticky = NSEW)
 
         back_to_formative_but = Button(self, text="Back to Formative Tests", width=20, command=lambda:newPage(self, ReleasedFormativeTest, "Released Formative Test", self.lecturerID))
         back_to_formative_but.grid(row=1, column=3, sticky=EW)
@@ -840,7 +840,7 @@ class DisplayFormativeStatistics(Frame):
         
         if len(submissions) == 0:
             empty_testlbl = Label(text="There have been no submissions made for this test.", font=("Arial", 14, "bold"))
-            empty_testlbl.grid(row=4, column=1, columnspan=6, rowspan=2, sticky=NSEW)
+            empty_testlbl.grid(row=4, column=0, columnspan=6, rowspan=2, sticky=NSEW)
         else:
             max_mark = int(submissions[0]['total_question'])
             sum_score = 0
@@ -900,12 +900,12 @@ class DisplayFormativeStatistics(Frame):
             least_correct = Label(text = "{question}".format(question=question_least_correct), font=("Arial",10))
             least_correct.grid(row = 8, column = 1, sticky = W)
             
-            percent_correct_lbl = Label(text = "Percent of correct answers across all student attempts:", font=("Arial",10))
-            percent_correct_lbl.grid(row = 9, column = 0, columnspan=3, sticky = NSEW)
+            percent_correct_lbl = Label(text = "Percent of correct answers\n across all student attempts:", font=("Arial",10))
+            percent_correct_lbl.grid(row = 9, column = 0, rowspan=5, sticky = NE)
             #row_adjuster = 9
             for question, percent in percent_correct_per_q.items():
                 percentage_for_q_lbl = Label(text = "{q}:  {p}%".format(q=question, p=percent), font=("Arial",10))
-                percentage_for_q_lbl.grid(row = row_adjuster + 10, column = 0, sticky = NSEW)
+                percentage_for_q_lbl.grid(row = row_adjuster + 9, column = 1, sticky = W)
                 
                 row_adjuster += 2
             
@@ -1235,8 +1235,8 @@ class DisplayIndividualStudentPerformance(Frame):
             rowAdjuster += 11
             question_no += 1
 
-'''			
+			
 root = Tk()
 app = LecturerMenu(root)
 root.mainloop()
-'''
+
