@@ -1,6 +1,0 @@
-question_no,question,answer_choices,is_correct_answer,answer_feedback
-Question 1,5 X 5 = ?,"{'A': '10', 'B': '25', 'C': '9001', 'D': '21'}","{'A': False, 'B': True, 'C': False, 'D': False}","{'A': 'v( ‘.’ )v\n', 'B': 'That was easy!\n', 'C': 'v( ‘.’ )v\n', 'D': 'v( ‘.’ )v\n'}"
-Question 2,1 / 0 = ?,"{'A': 'Explosion', 'B': '0', 'C': 'Error', 'D': '1'}","{'A': False, 'B': False, 'C': True, 'D': False}","{'A': 'commentA\n', 'B': 'commentB\n', 'C': 'commentC\n', 'D': 'commentD\n'}"
-Question 3,27 / 3 = ?,"{'A': '9', 'B': '8', 'C': '7', 'D': '6'}","{'A': True, 'B': False, 'C': False, 'D': False}","{'A': 'commentA\n', 'B': 'commentB\n', 'C': 'commentC\n', 'D': 'commentD\n'}"
-Question 4,4! = ?,"{'A': '23', 'B': '16', 'C': '10', 'D': '24'}","{'A': False, 'B': False, 'C': False, 'D': True}","{'A': 'commentA\n', 'B': 'commentB\n', 'C': 'commentC\n', 'D': 'commentD\n'}"
-Question 5,49 / 7 = 7?,"{'A': 'True', 'B': 'False', 'C': '', 'D': ''}","{'A': True, 'B': False, 'C': False, 'D': False}","{'A': 'commentA\n', 'B': 'commentB\n', 'C': '\n', 'D': '\n'}"
