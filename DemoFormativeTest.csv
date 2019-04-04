@@ -1,4 +1,0 @@
-question_no,question,answer_choices,is_correct_answer,answer_feedback
-Question 1,What is 5 x 25?,"{'A': '100', 'B': '125', 'C': '120', 'D': '155'}","{'A': False, 'B': True, 'C': False, 'D': False}","{'A': '\n', 'B': '\n', 'C': '\n', 'D': '\n'}"
-Question 2,How many sides does an octogon have?,"{'A': '5', 'B': '12', 'C': '6', 'D': '8'}","{'A': False, 'B': False, 'C': False, 'D': True}","{'A': '\n', 'B': '\n', 'C': '\n', 'D': '\n'}"
-Question 3,Which of the following = 24? (tick all correct answers),"{'A': '3 x (4 + 2)', 'B': '3 x 8', 'C': '4!', 'D': '28 - (2x3)'}","{'A': False, 'B': True, 'C': True, 'D': False}","{'A': '\n', 'B': '\n', 'C': '\n', 'D': '\n'}"
